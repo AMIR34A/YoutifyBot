@@ -1,8 +1,13 @@
+using Microsoft.EntityFrameworkCore;
+using System.Configuration;
+using YoutifyBot.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
+string config = builder.Configuration.GetConnectionString("YoutifyConnection");
+builder.Services.AddDbContext<YoutifyBotContext>(option => option.UseSqlServer(config));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
