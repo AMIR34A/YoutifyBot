@@ -21,14 +21,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\Management\Controllers\" />
     <Folder Include="Areas\Management\Data\" />
     <Folder Include="Areas\Management\Models\" />
     <Folder Include="Areas\Management\Views\" />
-    <Folder Include="Areas\YoutifyBot\Controllers\" />
     <Folder Include="Areas\YoutifyBot\Data\" />
     <Folder Include="Areas\YoutifyBot\Models\" />
-    <Folder Include="Areas\YoutifyBot\Views\" />
     <Folder Include="Views\Shared\" />
   </ItemGroup>
 

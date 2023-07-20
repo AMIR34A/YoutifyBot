@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using YoutifyBot.Models;
 using YoutifyBot.Models.Repository;
 
 namespace YoutifyBot.Controllers

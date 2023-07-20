@@ -14,7 +14,7 @@ public class UnitOfWork : IUnitOfWork
 
     public async Task SaveAsync() => await context.SaveChangesAsync();
 
-    public async Task CreateDatabase() => await context.Database.EnsureCreatedAsync();
+    public async Task CreateDatabaseAsync() => await context.Database.EnsureCreatedAsync();
 
     protected virtual void Dispose(bool disposing)
     {

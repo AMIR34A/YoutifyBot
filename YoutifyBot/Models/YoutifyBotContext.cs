@@ -4,13 +4,11 @@ namespace YoutifyBot.Models;
 
 public class YoutifyBotContext : DbContext
 {
-    public YoutifyBotContext(DbContextOptions contextOptions) : base(contextOptions)
-    {
-    }
     public DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        optionsBuilder.UseSqlServer("Server=(local);Database=YoutifyBotDb;Trusted_Connection=True;MultipleActiveResultSets=True;TrustServerCertificate=true");
         base.OnConfiguring(optionsBuilder);
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
