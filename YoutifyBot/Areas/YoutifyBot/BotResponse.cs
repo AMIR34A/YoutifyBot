@@ -75,9 +75,12 @@ public class BotResponse
     {
         if (update.CallbackQuery.Data is null)
             return;
-        var user = await botClient.GetChatMemberAsync("YoutifyNews", update.CallbackQuery.From.Id);
+
+        var user = await botClient.GetChatMemberAsync("@YoutifyNews", update.CallbackQuery.From.Id);
         if (user.Status == ChatMemberStatus.Left)
-            await botClient.EditMessageTextAsync(update.CallbackQuery.From.Id, update.CallbackQuery.Message.MessageId, "For dwonloading you have to join in the <b>@YoutifyNews</b>",
-                ParseMode.Html);
+        {
+            await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "For dwonloading you have to join in the @YoutifyNews \n Link in the bio", true);
+            return;
+        }
     }
 }

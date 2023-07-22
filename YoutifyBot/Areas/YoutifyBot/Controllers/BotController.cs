@@ -32,6 +32,8 @@ public class BotController : Controller
         BotResponse botResponse = new BotResponse();
         if (update.Type == UpdateType.Message && update.Message.Chat.Type == ChatType.Private)
             botResponse.ResponseToText(_botClient, update);
+        else
+            botResponse.ResponseToCallBackQuery(_botClient, update);
     }
 
     private static async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
