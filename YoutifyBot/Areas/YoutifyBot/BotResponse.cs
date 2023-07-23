@@ -75,12 +75,22 @@ public class BotResponse
     {
         if (update.CallbackQuery.Data is null)
             return;
+        YoutubeSpotifyOperation youtubeSpotifyOperation = new YoutubeSpotifyOperation();
 
         var user = await botClient.GetChatMemberAsync("@YoutifyNews", update.CallbackQuery.From.Id);
         if (user.Status == ChatMemberStatus.Left)
         {
             await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "For dwonloading you have to join in the @YoutifyNews \n Link in the bio", true);
             return;
+        }
+
+        using (var client = new HttpClient())
+        {
+            string url = await youtubeSpotifyOperation.GetDonwloadUrl(update.CallbackQuery);
+            using (var stream = await client.GetStreamAsync(url))
+            {
+                await botClient.SendVideoAsync(update.CallbackQuery.From.Id, new InputFileId("https://t.me/YoutifyNews/3"));
+            }
         }
     }
 }
