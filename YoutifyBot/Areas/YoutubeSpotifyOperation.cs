@@ -31,7 +31,7 @@ public class YoutubeSpotifyOperation
         return qualities;
     }
 
-    public async Task<string> GetDonwloadUrl(CallbackQuery callbackQuery)
+    public async Task<string> GetDonwloadUrlAsync(CallbackQuery callbackQuery)
     {
         var manifests = await youtubeClient.Videos.Streams.GetManifestAsync(callbackQuery.Message.Entities[0].Url);
         string size = callbackQuery.Data.Split('|')[1];

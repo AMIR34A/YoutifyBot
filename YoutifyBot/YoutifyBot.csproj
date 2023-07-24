@@ -17,11 +17,11 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.8" />
     <PackageReference Include="SpotifyAPI.Web" Version="7.0.0" />
     <PackageReference Include="Telegram.Bot" Version="19.0.0" />
+    <PackageReference Include="WTelegramClient" Version="3.5.3" />
     <PackageReference Include="YoutubeExplode" Version="6.2.17" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas\Management\Controllers\" />
     <Folder Include="Areas\Management\Data\" />
     <Folder Include="Areas\Management\Models\" />
     <Folder Include="Areas\Management\Views\" />

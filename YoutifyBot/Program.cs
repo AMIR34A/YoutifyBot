@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<YoutifyBotContext>();
+builder.Services.AddSingleton<ConfigurationManager>();
 //builder.Services.AddDbContext<YoutifyBotContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("YoutifyConnection")));
 
 var app = builder.Build();
@@ -21,9 +22,14 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapAreaControllerRoute(
-    name: "YoutifyBot",
+    name: "youtifybot_route",
     areaName: "YoutifyBot",
     pattern: "YoutifyBot/{controller}/{action}");
+
+app.MapAreaControllerRoute(
+    name: "management_route",
+    areaName: "Management",
+    pattern: "Management/{controller}/{action}");
 
 app.MapControllerRoute(
     name: "default",

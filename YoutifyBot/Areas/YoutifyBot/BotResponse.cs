@@ -1,10 +1,13 @@
-﻿using System.Text;
+﻿using System.Net;
+using System.Text;
 using Telegram.Bot;
-using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
+using TL;
+using WTelegram;
 using YoutifyBot.Models;
 using YoutifyBot.Models.Repository;
+using Update = Telegram.Bot.Types.Update;
 using User = YoutifyBot.Models.User;
 
 namespace YoutifyBot.Areas.YoutifyBot;
@@ -84,13 +87,51 @@ public class BotResponse
             return;
         }
 
-        using (var client = new HttpClient())
+        string url = await youtubeSpotifyOperation.GetDonwloadUrlAsync(update.CallbackQuery);
+
+        System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+
+        var client = new HttpClient();
+
+        using (var stream = await client.GetStreamAsync(url))
         {
-            string url = await youtubeSpotifyOperation.GetDonwloadUrl(update.CallbackQuery);
-            using (var stream = await client.GetStreamAsync(url))
+            Client clientBot = new Client(Config);
+            await clientBot.LoginUserIfNeeded();
+
+            try
             {
-                await botClient.SendVideoAsync(update.CallbackQuery.From.Id, new InputFileId("https://t.me/YoutifyNews/3"));
+                var contentLnegth = await client.GetAsync(url);
+                var file = await clientBot.UploadFileAsync(new Helpers.IndirectStream(stream) { ContentLength = contentLnegth.Content.Headers.ContentLength }, "test.mp4");
+                await clientBot.SendMediaAsync(InputPeer.Self, "test", file);
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+
+
+
+
+            // await botClient.SendVideoAsync(update.CallbackQuery.From.Id, new InputFileStream(stream));
+        }
+
+
+
+
+
+    }
+    static string Config(string what)
+    {
+        switch (what)
+        {
+            case "api_id": return "10028138";
+            case "api_hash": return "db88d1744ab8e4ea8d213b5b960a5423";
+            case "phone_number": return "+989152663439";
+            case "verification_code": return "";
+            //case "first_name": return configurationSections["first_name"];
+            //case "last_name": return configurationSections["last_name"];
+            default: return null;
         }
     }
 }
