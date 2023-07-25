@@ -1,10 +1,8 @@
-﻿using System.Net;
-using System.Text;
+﻿using System.Text;
 using Telegram.Bot;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
-using TL;
-using WTelegram;
 using YoutifyBot.Models;
 using YoutifyBot.Models.Repository;
 using Update = Telegram.Bot.Types.Update;
@@ -44,7 +42,7 @@ public class BotResponse
             stringBuilder.AppendLine("Hi my friend👋");
             stringBuilder.AppendLine("•You can download from youtube and spotify;");
             stringBuilder.AppendLine("•Also you can use the <b>Menu</b> button for more informations");
-            stringBuilder.AppendLine("<b>⚙️I'm ready, just send me the link😃</b>");
+            stringBuilder.AppendLine("<b>I'm ready, just send me the link😃</b>");
             await botClient.SendTextMessageAsync(chatId, stringBuilder.ToString(), null, ParseMode.Html);
         }
 
@@ -76,9 +74,8 @@ public class BotResponse
 
     public async Task ResponseToCallBackQuery(TelegramBotClient botClient, Update update)
     {
-        if (update.CallbackQuery.Data is null)
+        if (!Enum.Equals(update.Type, UpdateType.CallbackQuery))
             return;
-        YoutubeSpotifyOperation youtubeSpotifyOperation = new YoutubeSpotifyOperation();
 
         var user = await botClient.GetChatMemberAsync("@YoutifyNews", update.CallbackQuery.From.Id);
         if (user.Status == ChatMemberStatus.Left)
@@ -87,51 +84,34 @@ public class BotResponse
             return;
         }
 
+        await botClient.EditMessageTextAsync(update.CallbackQuery.From.Id, update.CallbackQuery.Message.MessageId, "<pre>⚙️Processing is started...</pre>",
+            ParseMode.Html);
+
+        YoutubeSpotifyOperation youtubeSpotifyOperation = new YoutubeSpotifyOperation();
         string url = await youtubeSpotifyOperation.GetDonwloadUrlAsync(update.CallbackQuery);
 
-        System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+        var data = update.CallbackQuery.Data;
 
-        var client = new HttpClient();
-
-        using (var stream = await client.GetStreamAsync(url))
+        try
         {
-            Client clientBot = new Client(Config);
-            await clientBot.LoginUserIfNeeded();
-
-            try
+            if (data.StartsWith("Youtube"))
             {
-                var contentLnegth = await client.GetAsync(url);
-                var file = await clientBot.UploadFileAsync(new Helpers.IndirectStream(stream) { ContentLength = contentLnegth.Content.Headers.ContentLength }, "test.mp4");
-                await clientBot.SendMediaAsync(InputPeer.Self, "test", file);
+                if (double.Parse(data.Split('|')[1]) <= 20)
+                {
+                    await botClient.SendChatActionAsync(update.CallbackQuery.From.Id, ChatAction.UploadVideo);
+                    await botClient.SendVideoAsync(update.CallbackQuery.From.Id, new InputFileUrl(url));
+                    return;
+                }
+
+                CliBot cliBot = new CliBot();
+                int mediaMessageId = await cliBot.SendAndGetMediaMessageIdAsync(url);
+                await botClient.SendChatActionAsync(update.CallbackQuery.From.Id, ChatAction.UploadVideo);
+                await botClient.SendVideoAsync(update.CallbackQuery.From.Id, new InputFileId($"https://t.me/YoutifyArchive/{mediaMessageId}"));
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-
-
-
-
-
-            // await botClient.SendVideoAsync(update.CallbackQuery.From.Id, new InputFileStream(stream));
         }
-
-
-
-
-
-    }
-    static string Config(string what)
-    {
-        switch (what)
+        catch(Exception ex)
         {
-            case "api_id": return "10028138";
-            case "api_hash": return "db88d1744ab8e4ea8d213b5b960a5423";
-            case "phone_number": return "+989152663439";
-            case "verification_code": return "";
-            //case "first_name": return configurationSections["first_name"];
-            //case "last_name": return configurationSections["last_name"];
-            default: return null;
+            Console.WriteLine(ex.Message);
         }
     }
 }
