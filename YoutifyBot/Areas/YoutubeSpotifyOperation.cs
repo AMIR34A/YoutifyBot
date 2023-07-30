@@ -23,19 +23,20 @@ public class YoutubeSpotifyOperation
 
 
         foreach (var video in videos)
-            qualities.Add(new InlineKeyboardButton[] { InlineKeyboardButton.WithCallbackData($"🎥 | {video.Size.MegaBytes:F2}Mb", $"Youtube|{video.Size.MegaBytes:F2}") });
+            qualities.Add(new InlineKeyboardButton[] { InlineKeyboardButton.WithCallbackData($"🎥 | {Math.Round(video.Size.MegaBytes)}Mb", $"YoutubeMovie|{Math.Round(video.Size.MegaBytes)}") });
 
         foreach (var audio in audioes)
-            qualities.Add(new InlineKeyboardButton[] { InlineKeyboardButton.WithCallbackData($"🎧 | {audio.Size.MegaBytes:F2}Mb", $"Youtube|{audio.Size.MegaBytes:F2}") });
+            qualities.Add(new InlineKeyboardButton[] { InlineKeyboardButton.WithCallbackData($"🎧 | {Math.Round(audio.Size.MegaBytes)}Mb", $"YoutubeMusic|{Math.Round(audio.Size.MegaBytes)}") });
 
         return qualities;
     }
 
-    public async Task<string> GetDonwloadUrlAsync(CallbackQuery callbackQuery)
+    public async Task<Stream> DownloadMediaAsync(string url, double size, bool isMovie)
     {
-        var manifests = await youtubeClient.Videos.Streams.GetManifestAsync(callbackQuery.Message.Entities[0].Url);
-        string size = callbackQuery.Data.Split('|')[1];
-        string url = manifests.Streams.Where(file => file.Size.MegaBytes.ToString("F2").Equals(size)).First().Url;
-        return url;
+        var manifests = await youtubeClient.Videos.Streams.GetManifestAsync(url);
+        dynamic streamInfo = isMovie ? manifests.GetMuxedStreams().Where(audio => Math.Round(audio.Size.MegaBytes) == size).First() :
+                                       manifests.GetAudioOnlyStreams().Where(audio => Math.Round(audio.Size.MegaBytes) == size).First();
+        var stream = await youtubeClient.Videos.Streams.GetAsync(streamInfo);
+        return stream;
     }
 }

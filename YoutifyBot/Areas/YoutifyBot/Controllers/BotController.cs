@@ -10,7 +10,8 @@ namespace YoutifyBot.Areas.YoutifyBot.Controllers;
 public class BotController : Controller
 {
     static TelegramBotClient _botClient;
-    public BotController()
+    static CliBot cliBot;
+    public BotController(CliBot cli)
     {
         _botClient = new TelegramBotClient("6398637615:AAFqcxLt-HuY16lOPybbZYhlx1jVF6iK54Y");
 
@@ -21,6 +22,7 @@ public class BotController : Controller
         };
 
         _botClient.StartReceiving(HandleUpdateAsyns, HandleErrorAsync, receiverOptions);
+        cliBot = cli;
     }
     public IActionResult Index()
     {
@@ -29,7 +31,7 @@ public class BotController : Controller
 
     private static async Task HandleUpdateAsyns(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
-        BotResponse botResponse = new BotResponse();
+        BotResponse botResponse = new BotResponse(cliBot);
         if (update.Type == UpdateType.Message && update.Message.Chat.Type == ChatType.Private)
             botResponse.ResponseToText(_botClient, update);
         else

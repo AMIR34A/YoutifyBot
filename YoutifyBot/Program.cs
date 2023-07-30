@@ -1,4 +1,5 @@
-using Microsoft.EntityFrameworkCore;
+using WTelegram;
+using YoutifyBot.Areas;
 using YoutifyBot.Models;
 using YoutifyBot.Models.Repository;
 
@@ -8,7 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<YoutifyBotContext>();
-builder.Services.AddSingleton<ConfigurationManager>();
+builder.Services.AddSingleton<CliBot>();
+builder.Services.AddSingleton(new Client(CliBot.Config));
 //builder.Services.AddDbContext<YoutifyBotContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("YoutifyConnection")));
 
 var app = builder.Build();

@@ -12,6 +12,12 @@ namespace YoutifyBot.Areas.YoutifyBot;
 
 public class BotResponse
 {
+    CliBot cliBot;
+    public BotResponse(CliBot cliBot)
+    {
+        this.cliBot = cliBot;
+    }
+
     public async Task ResponseToText(TelegramBotClient botClient, Update update)
     {
         if (update.Message.Type != MessageType.Text)
@@ -88,28 +94,37 @@ public class BotResponse
             ParseMode.Html);
 
         YoutubeSpotifyOperation youtubeSpotifyOperation = new YoutubeSpotifyOperation();
-        string url = await youtubeSpotifyOperation.GetDonwloadUrlAsync(update.CallbackQuery);
 
         var data = update.CallbackQuery.Data;
 
         try
         {
-            if (data.StartsWith("Youtube"))
+            string url = update.CallbackQuery.Message.Entities[0].Url;
+            double size = double.Parse(data.Split('|')[1]);
+            if (data.StartsWith("YoutubeMovie"))
             {
-                if (double.Parse(data.Split('|')[1]) <= 20)
-                {
-                    await botClient.SendChatActionAsync(update.CallbackQuery.From.Id, ChatAction.UploadVideo);
-                    await botClient.SendVideoAsync(update.CallbackQuery.From.Id, new InputFileUrl(url));
-                    return;
-                }
-
-                CliBot cliBot = new CliBot();
-                int mediaMessageId = await cliBot.SendAndGetMediaMessageIdAsync(url);
+                //if (size <= 20)
+                //{
+                //    await botClient.SendChatActionAsync(update.CallbackQuery.From.Id, ChatAction.UploadVideo);
+                //    await botClient.SendVideoAsync(update.CallbackQuery.From.Id, new InputFileUrl(url));
+                //    return;
+                //}
+                //CliBot cliBot = new CliBot();
+                var stream = await youtubeSpotifyOperation.DownloadMediaAsync(url, size, true);
+                int mediaMessageId = await cliBot.SendAndGetMediaMessageIdAsync(stream, true);
                 await botClient.SendChatActionAsync(update.CallbackQuery.From.Id, ChatAction.UploadVideo);
                 await botClient.SendVideoAsync(update.CallbackQuery.From.Id, new InputFileId($"https://t.me/YoutifyArchive/{mediaMessageId}"));
             }
+            else
+            {
+                //CliBot cliBot = new CliBot();
+                var stream = await youtubeSpotifyOperation.DownloadMediaAsync(url, size, false);
+                int mediaMessageId = await cliBot.SendAndGetMediaMessageIdAsync(stream, false);
+                await botClient.SendChatActionAsync(update.CallbackQuery.From.Id, ChatAction.UploadVoice);
+                await botClient.SendAudioAsync(update.CallbackQuery.From.Id, new InputFileId($"https://t.me/YoutifyArchive/{mediaMessageId}"));
+            }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
         }

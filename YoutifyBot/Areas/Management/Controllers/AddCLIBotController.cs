@@ -7,8 +7,8 @@ public class AddCLIBotController : Controller
 {
     public async Task<IActionResult> Index()
     {
-        CliBot cliBot = new CliBot();
-        await cliBot.LoginAsync();
+       // CliBot cliBot = new CliBot();
+        //await cliBot.LoginAsync();
         return View();
     }
 }
