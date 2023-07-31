@@ -1,6 +1,8 @@
-﻿using Telegram.Bot.Types;
+﻿using SpotifyAPI.Web;
 using Telegram.Bot.Types.ReplyMarkups;
 using YoutubeExplode;
+using YoutubeExplode.Search;
+using YoutubeExplode.Videos.Streams;
 
 namespace YoutifyBot.Areas;
 
@@ -23,20 +25,52 @@ public class YoutubeSpotifyOperation
 
 
         foreach (var video in videos)
-            qualities.Add(new InlineKeyboardButton[] { InlineKeyboardButton.WithCallbackData($"🎥 | {Math.Round(video.Size.MegaBytes)}Mb", $"YoutubeMovie|{Math.Round(video.Size.MegaBytes)}") });
+            qualities.Add(new InlineKeyboardButton[] { InlineKeyboardButton.WithCallbackData($"🎥 | {video.Size.MegaBytes.ToString("F2")}Mb", $"YoutubeMovie|{video.Size.MegaBytes.ToString("F2")}") });
 
         foreach (var audio in audioes)
-            qualities.Add(new InlineKeyboardButton[] { InlineKeyboardButton.WithCallbackData($"🎧 | {Math.Round(audio.Size.MegaBytes)}Mb", $"YoutubeMusic|{Math.Round(audio.Size.MegaBytes)}") });
+            qualities.Add(new InlineKeyboardButton[] { InlineKeyboardButton.WithCallbackData($"🎧 | {audio.Size.MegaBytes.ToString("F2")}Mb", $"YoutubeMusic|{audio.Size.MegaBytes.ToString("F2")}") });
 
         return qualities;
     }
 
-    public async Task<Stream> DownloadMediaAsync(string url, double size, bool isMovie)
+    public async Task<Stream> DownloadMediaAsync(string url, double? size, bool isMovie)
     {
         var manifests = await youtubeClient.Videos.Streams.GetManifestAsync(url);
-        dynamic streamInfo = isMovie ? manifests.GetMuxedStreams().Where(audio => Math.Round(audio.Size.MegaBytes) == size).First() :
-                                       manifests.GetAudioOnlyStreams().Where(audio => Math.Round(audio.Size.MegaBytes) == size).First();
+
+        if (!size.HasValue)
+        {
+            var musicStreamInfo = manifests.GetAudioOnlyStreams().TryGetWithHighestBitrate();
+            Stream musicStream = await youtubeClient.Videos.Streams.GetAsync(musicStreamInfo);
+            return musicStream;
+        }
+
+        dynamic streamInfo = isMovie ? manifests.GetMuxedStreams().MinBy(audio => Math.Abs(audio.Size.MegaBytes - size.Value)) :
+                   manifests.GetAudioOnlyStreams().MinBy(audio => Math.Abs(audio.Size.MegaBytes - size.Value));
         var stream = await youtubeClient.Videos.Streams.GetAsync(streamInfo);
         return stream;
+    }
+
+    public async Task<Stream> DownloadMediaBySearchAsync(string searchQuery)
+    {
+        string[] musicDetails = searchQuery.Split('|');
+        await foreach (var item in youtubeClient.Search.GetResultsAsync($"song {musicDetails[0]} by {musicDetails[1]}"))
+        {
+            switch (item)
+            {
+                case VideoSearchResult video:
+                    var stream = await DownloadMediaAsync(video.Url, 20, false);
+                    return stream;
+            }
+        }
+        return await Task.FromResult<Stream>(null);
+    }
+
+    public async Task<string> GetMusicInfoAsync(string url)
+    {
+        var config = SpotifyClientConfig.CreateDefault().WithAuthenticator(new ClientCredentialsAuthenticator("76a349a2073c402694e21bff6aefffca", "b857ae9c44f44bc7a0c3d0f7cde999cf"));
+        SpotifyClient spotifyClient = new SpotifyClient(config);
+        string newUrl = url.Split('?')[0].Replace("https://open.spotify.com/track/", "");
+        var track = await spotifyClient.Tracks.Get(newUrl);
+        return $"{track.Name}|{track.Artists.First().Name}";
     }
 }

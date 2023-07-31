@@ -26,55 +26,70 @@ public class BotResponse
         StringBuilder stringBuilder = new StringBuilder();
         long chatId = update.Message.Chat.Id;
         string text = update.Message.Text;
+        YoutubeSpotifyOperation youtubeSpotifyOperation = new YoutubeSpotifyOperation();
 
-        if (text.Equals("/start"))
+        switch (text)
         {
-            using (IUnitOfWork unitOfWork = new UnitOfWork(new YoutifyBotContext()))
-            {
-                User user = await unitOfWork.Repository<User>().FindByChatId(chatId);
-                if (user is null)
+            case string when text.Equals("/start"):
+                using (IUnitOfWork unitOfWork = new UnitOfWork(new YoutifyBotContext()))
                 {
-                    User newUser = new User
+                    User user = await unitOfWork.Repository<User>().FindByChatId(chatId);
+                    if (user is null)
                     {
-                        ChatId = chatId,
-                        FirstName = update.Message.Chat.FirstName,
-                        LastName = update.Message.Chat.LastName,
-                        Username = update.Message.Chat.Username
-                    };
-                    await unitOfWork.Repository<User>().CreateAsync(newUser);
-                    await unitOfWork.SaveAsync();
+                        User newUser = new User
+                        {
+                            ChatId = chatId,
+                            FirstName = update.Message.Chat.FirstName,
+                            LastName = update.Message.Chat.LastName,
+                            Username = update.Message.Chat.Username
+                        };
+                        await unitOfWork.Repository<User>().CreateAsync(newUser);
+                        await unitOfWork.SaveAsync();
+                    }
                 }
-            }
-            stringBuilder.AppendLine("Hi my friend👋");
-            stringBuilder.AppendLine("•You can download from youtube and spotify;");
-            stringBuilder.AppendLine("•Also you can use the <b>Menu</b> button for more informations");
-            stringBuilder.AppendLine("<b>I'm ready, just send me the link😃</b>");
-            await botClient.SendTextMessageAsync(chatId, stringBuilder.ToString(), null, ParseMode.Html);
-        }
+                stringBuilder.AppendLine("Hi my friend👋");
+                stringBuilder.AppendLine("•You can download from youtube and spotify;");
+                stringBuilder.AppendLine("•Also you can use the <b>Menu</b> button for more informations");
+                stringBuilder.AppendLine("<b>I'm ready, just send me the link😃</b>");
+                await botClient.SendTextMessageAsync(chatId, stringBuilder.ToString(), null, ParseMode.Html);
+                break;
 
-        else if (text.Equals("/help"))
-        {
-            stringBuilder.AppendLine("You just need to send video or music link to me");
-            stringBuilder.AppendLine("<b>Your link for downloading video and music must have this formats :</b>");
-            stringBuilder.AppendLine("🎞https://www.youtube.com/... | https://youtu.be/...");
-            stringBuilder.AppendLine("🎵https://open.spotify.com/track/...");
-            await botClient.SendTextMessageAsync(chatId, stringBuilder.ToString(), null, ParseMode.Html, null, true);
-        }
 
-        else if (text.StartsWith("https://www.youtube.com/") || text.StartsWith("https://youtu.be/"))
-        {
-            YoutubeSpotifyOperation youtubeSpotifyOperation = new YoutubeSpotifyOperation();
+            case string when text.Equals("/help"):
+                stringBuilder.AppendLine("You just need to send video or music link to me.");
+                stringBuilder.AppendLine("<b>Your link for downloading video and music must have this formats :</b>");
+                stringBuilder.AppendLine("<pre>🎞Youtube :</pre>");
+                stringBuilder.AppendLine("▪️https://www.youtube.com/...");
+                stringBuilder.AppendLine("▪️https://youtu.be/...");
+                stringBuilder.AppendLine("<pre>🎵Spotify</pre>");
+                stringBuilder.AppendLine("▪️https://open.spotify.com/track/...");
+                await botClient.SendTextMessageAsync(chatId, stringBuilder.ToString(), null, ParseMode.Html, null, true);
+                break;
 
-            if (text.StartsWith("https://www.youtube.com/live"))
-                text = text.Replace("live/", "watch?v=").Replace("?feature=share", "");
 
-            var qualities = await youtubeSpotifyOperation.GetAllVideoQualities(text);
+            case string when text.StartsWith("https://www.youtube.com/"):
+            case string when text.StartsWith("https://youtu.be/"):
+                if (text.StartsWith("https://www.youtube.com/live"))
+                    text = text.Replace("live/", "watch?v=").Replace("?feature=share", "");
 
-            stringBuilder.AppendLine($"🔗<a href=\"{text}\">Your video link</a>");
-            stringBuilder.AppendLine("✔️<b>Select the format and quality :</b>");
+                var qualities = await youtubeSpotifyOperation.GetAllVideoQualities(text);
 
-            await botClient.SendTextMessageAsync(chatId, stringBuilder.ToString(), null,
-                  ParseMode.Html, null, true, false, null, update.Message.MessageId, null, new InlineKeyboardMarkup(qualities));
+                stringBuilder.AppendLine($"🔗<a href=\"{text}\">Your video link</a>");
+                stringBuilder.AppendLine("✔️<b>Select the format and quality :</b>");
+
+                await botClient.SendTextMessageAsync(chatId, stringBuilder.ToString(), parseMode: ParseMode.Html,
+                    disableWebPagePreview: true, replyToMessageId: update.Message.MessageId, replyMarkup: new InlineKeyboardMarkup(qualities));
+                break;
+
+
+            case string when text.StartsWith("https://open.spotify.com/track/"):
+                await botClient.SendTextMessageAsync(update.Message.Chat.Id, "<pre>⚙️Processing is started...</pre>",
+                              parseMode: ParseMode.Html, replyToMessageId: update.Message.MessageId);
+                string searchQuery = await youtubeSpotifyOperation.GetMusicInfoAsync(text);
+                var stream = await youtubeSpotifyOperation.DownloadMediaBySearchAsync(searchQuery);
+                string[] musicDetails = searchQuery.Split('|');
+                await botClient.SendAudioAsync(update.Message.Chat.Id, new InputFileStream(stream), title: musicDetails[0], performer: musicDetails[1]);
+                break;
         }
     }
 
@@ -101,24 +116,30 @@ public class BotResponse
         {
             string url = update.CallbackQuery.Message.Entities[0].Url;
             double size = double.Parse(data.Split('|')[1]);
+
             if (data.StartsWith("YoutubeMovie"))
             {
-                //if (size <= 20)
-                //{
-                //    await botClient.SendChatActionAsync(update.CallbackQuery.From.Id, ChatAction.UploadVideo);
-                //    await botClient.SendVideoAsync(update.CallbackQuery.From.Id, new InputFileUrl(url));
-                //    return;
-                //}
-                //CliBot cliBot = new CliBot();
                 var stream = await youtubeSpotifyOperation.DownloadMediaAsync(url, size, true);
+
+                if (size < 50)
+                {
+                    await botClient.SendChatActionAsync(update.CallbackQuery.From.Id, ChatAction.UploadVideo);
+                    await botClient.SendVideoAsync(update.CallbackQuery.From.Id, new InputFileStream(stream));
+                    return;
+                }
                 int mediaMessageId = await cliBot.SendAndGetMediaMessageIdAsync(stream, true);
                 await botClient.SendChatActionAsync(update.CallbackQuery.From.Id, ChatAction.UploadVideo);
                 await botClient.SendVideoAsync(update.CallbackQuery.From.Id, new InputFileId($"https://t.me/YoutifyArchive/{mediaMessageId}"));
             }
             else
             {
-                //CliBot cliBot = new CliBot();
                 var stream = await youtubeSpotifyOperation.DownloadMediaAsync(url, size, false);
+
+                if (size < 50)
+                {
+                    await botClient.SendChatActionAsync(update.CallbackQuery.From.Id, ChatAction.RecordVideo);
+                    await botClient.SendAudioAsync(update.CallbackQuery.From.Id, new InputFileStream(stream));
+                }
                 int mediaMessageId = await cliBot.SendAndGetMediaMessageIdAsync(stream, false);
                 await botClient.SendChatActionAsync(update.CallbackQuery.From.Id, ChatAction.UploadVoice);
                 await botClient.SendAudioAsync(update.CallbackQuery.From.Id, new InputFileId($"https://t.me/YoutifyArchive/{mediaMessageId}"));
