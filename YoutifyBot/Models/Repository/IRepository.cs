@@ -2,8 +2,9 @@
 
 public interface IRepository<TEntity> : IDisposable
 {
-    Task<IEnumerable<TEntity>> GetAllUserAsync();
+    Task<IEnumerable<TEntity>> GetAllAsync();
     Task CreateAsync(TEntity entity);
+    Task<TEntity> GetFirstAsync();
     Task<TEntity> FindByChatId(long chatId);
     void Delete(TEntity entity);
     void Update(TEntity entity);

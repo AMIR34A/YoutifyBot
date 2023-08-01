@@ -30,10 +30,31 @@ public class BotResponse
 
         switch (text)
         {
-            case string when text.Equals("/start"):
+            case string when text.Contains("/start"):
                 using (IUnitOfWork unitOfWork = new UnitOfWork(new YoutifyBotContext()))
                 {
+                    Rule rule = await unitOfWork.Repository<Rule>().GetFirstAsync();
                     User user = await unitOfWork.Repository<User>().FindByChatId(chatId);
+
+                    if (text.Contains("invite"))
+                    {
+                        long invitedByChatId = long.Parse(text.Split('_')[1]);
+                        User isExist = await unitOfWork.Repository<User>().FindByChatId(update.Message.Chat.Id);
+                        if (invitedByChatId != update.Message.Chat.Id && isExist is null)
+                        {
+                            var invitedByuser = await unitOfWork.Repository<User>().FindByChatId(invitedByChatId);
+                            if (invitedByuser.TotalDownloadVolume < rule.MaximumDownloadVolume)
+                                invitedByuser.TotalDownloadVolume += 100;
+                            await unitOfWork.SaveAsync();
+                            stringBuilder.AppendLine("One user was invited by you🎉");
+                            stringBuilder.AppendLine("The maximum size of video you can download was updated");
+                            stringBuilder.AppendLine("<b>You can see more detain in your profile</b>");
+                            await botClient.SendTextMessageAsync(invitedByChatId, stringBuilder.ToString(), null, ParseMode.Html,
+                                replyMarkup: new InlineKeyboardMarkup(InlineKeyboardButton.WithCallbackData("🖥Proile", "Profile")));
+                            stringBuilder.Clear();
+                        }
+                    }
+
                     if (user is null)
                     {
                         User newUser = new User
@@ -41,12 +62,15 @@ public class BotResponse
                             ChatId = chatId,
                             FirstName = update.Message.Chat.FirstName,
                             LastName = update.Message.Chat.LastName,
-                            Username = update.Message.Chat.Username
+                            Username = update.Message.Chat.Username,
+                            TotalDownloadVolume = rule.BaseDownloadVolume,
+                            TotalCountDownload = rule.BaseCountDownload,
                         };
                         await unitOfWork.Repository<User>().CreateAsync(newUser);
-                        await unitOfWork.SaveAsync();
                     }
+                    await unitOfWork.SaveAsync();
                 }
+
                 stringBuilder.AppendLine("Hi my friend👋");
                 stringBuilder.AppendLine("•You can download from youtube and spotify;");
                 stringBuilder.AppendLine("•Also you can use the <b>Menu</b> button for more informations");

@@ -10,7 +10,7 @@ namespace YoutifyBot.Models.Repository
         {
             this.context = context;
         }
-        public async Task<int> Count() => await context.Users.CountAsync();
+        public async Task<int> Count() => await context.Set<TEntity>().CountAsync();
 
         public async Task CreateAsync(TEntity entity) => await context.AddAsync<TEntity>(entity);
 
@@ -18,7 +18,8 @@ namespace YoutifyBot.Models.Repository
 
         public async Task<TEntity> FindByChatId(long chatId) => await context.FindAsync<TEntity>(chatId);
 
-        public async Task<IEnumerable<TEntity>> GetAllUserAsync() => await context.Set<TEntity>().ToListAsync();
+        public async Task<IEnumerable<TEntity>> GetAllAsync() => await context.Set<TEntity>().ToListAsync();
+        public async Task<TEntity> GetFirstAsync() => await context.Set<TEntity>().FirstAsync();
 
         public void Update(TEntity entity) => context.Update<TEntity>(entity);
 

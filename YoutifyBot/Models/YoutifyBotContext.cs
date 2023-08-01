@@ -5,6 +5,7 @@ namespace YoutifyBot.Models;
 public class YoutifyBotContext : DbContext
 {
     public DbSet<User> Users { get; set; }
+    public DbSet<Rule> Rules { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
