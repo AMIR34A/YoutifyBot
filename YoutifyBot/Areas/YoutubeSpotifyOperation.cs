@@ -25,10 +25,10 @@ public class YoutubeSpotifyOperation
 
 
         foreach (var video in videos)
-            qualities.Add(new InlineKeyboardButton[] { InlineKeyboardButton.WithCallbackData($"🎥 | {video.Size.MegaBytes.ToString("F2")}Mb", $"YoutubeMovie|{video.Size.MegaBytes.ToString("F2")}") });
+            qualities.Add(new InlineKeyboardButton[] { InlineKeyboardButton.WithCallbackData($"🎥 | {video.Size.MegaBytes.ToString("F2")}MB", $"YoutubeMovie|{video.Size.MegaBytes.ToString("F2")}") });
 
         foreach (var audio in audioes)
-            qualities.Add(new InlineKeyboardButton[] { InlineKeyboardButton.WithCallbackData($"🎧 | {audio.Size.MegaBytes.ToString("F2")}Mb", $"YoutubeMusic|{audio.Size.MegaBytes.ToString("F2")}") });
+            qualities.Add(new InlineKeyboardButton[] { InlineKeyboardButton.WithCallbackData($"🎧 | {audio.Size.MegaBytes.ToString("F2")}MB", $"YoutubeMusic|{audio.Size.MegaBytes.ToString("F2")}") });
 
         return qualities;
     }

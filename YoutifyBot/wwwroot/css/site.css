@@ -20,3 +20,37 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.container {
+    display: -webkit-inline-box !important;
+}
+.navbar-nav {
+    display: flex;
+    flex-direction: inherit;
+}
+.navbar-nav .nav-link {
+    margin-left:10px !important;
+}
+.collapse:not(.show) {
+   display: -webkit-inline-box !important;
+}
+.container-fluid {
+    display: flow !important;
+}
+.navbar > .container, .navbar > .container-fluid, .navbar > .container-sm, .navbar > .container-md, .navbar > .container-lg, .navbar > .container-xl, .navbar > .container-xxl {
+    display: -webkit-inline-box;
+}
+.navbar {
+    display: block;
+}
+.nav-link {
+    display: block;
+    padding: 0.5rem 1rem;
+    color: #ffffff;
+}
+a {
+    color: #ffffff;
+}
+a:hover {
+        color: #FFCC00
+}

@@ -27,7 +27,6 @@
     <Folder Include="Areas\Management\Views\" />
     <Folder Include="Areas\YoutifyBot\Data\" />
     <Folder Include="Areas\YoutifyBot\Models\" />
-    <Folder Include="Views\Shared\" />
   </ItemGroup>
 
 </Project>

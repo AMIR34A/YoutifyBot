@@ -40,17 +40,17 @@ public class BotResponse
                     {
                         long invitedByChatId = long.Parse(text.Split('_')[1]);
                         User isExist = await unitOfWork.Repository<User>().FindByChatId(update.Message.Chat.Id);
-                        if (invitedByChatId != update.Message.Chat.Id && isExist is null)
+                        if (isExist is null)
                         {
                             var invitedByuser = await unitOfWork.Repository<User>().FindByChatId(invitedByChatId);
                             if (invitedByuser.TotalDownloadVolume < rule.MaximumDownloadVolume)
                                 invitedByuser.TotalDownloadVolume += 100;
                             await unitOfWork.SaveAsync();
                             stringBuilder.AppendLine("One user was invited by you🎉");
-                            stringBuilder.AppendLine("The maximum size of video you can download was updated");
-                            stringBuilder.AppendLine("<b>You can see more detain in your profile</b>");
+                            stringBuilder.AppendLine("The maximum size of video you can download was updated.");
+                            stringBuilder.AppendLine("<b>You can see more detail in your profile</b>");
                             await botClient.SendTextMessageAsync(invitedByChatId, stringBuilder.ToString(), null, ParseMode.Html,
-                                replyMarkup: new InlineKeyboardMarkup(InlineKeyboardButton.WithCallbackData("🖥Proile", "Profile")));
+                                replyMarkup: new InlineKeyboardMarkup(InlineKeyboardButton.WithCallbackData("🖥Profile", "Profile")));
                             stringBuilder.Clear();
                         }
                     }
@@ -122,15 +122,12 @@ public class BotResponse
         if (!Enum.Equals(update.Type, UpdateType.CallbackQuery))
             return;
 
-        var user = await botClient.GetChatMemberAsync("@YoutifyNews", update.CallbackQuery.From.Id);
-        if (user.Status == ChatMemberStatus.Left)
+        var userStatus = await botClient.GetChatMemberAsync("@YoutifyNews", update.CallbackQuery.From.Id);
+        if (userStatus.Status == ChatMemberStatus.Left)
         {
             await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "For dwonloading you have to join in the @YoutifyNews \n Link in the bio", true);
             return;
         }
-
-        await botClient.EditMessageTextAsync(update.CallbackQuery.From.Id, update.CallbackQuery.Message.MessageId, "<pre>⚙️Processing is started...</pre>",
-            ParseMode.Html);
 
         YoutubeSpotifyOperation youtubeSpotifyOperation = new YoutubeSpotifyOperation();
 
@@ -138,35 +135,68 @@ public class BotResponse
 
         try
         {
-            string url = update.CallbackQuery.Message.Entities[0].Url;
-            double size = double.Parse(data.Split('|')[1]);
-
-            if (data.StartsWith("YoutubeMovie"))
+            if (data.StartsWith("Youtube"))
             {
-                var stream = await youtubeSpotifyOperation.DownloadMediaAsync(url, size, true);
+                string url = update.CallbackQuery.Message.Entities[0].Url;
+                double size = double.Parse(data.Split('|')[1]);
 
-                if (size < 50)
+                StringBuilder stringBuilder = new StringBuilder();
+                using (IUnitOfWork unitOfWork = new UnitOfWork(new YoutifyBotContext()))
                 {
-                    await botClient.SendChatActionAsync(update.CallbackQuery.From.Id, ChatAction.UploadVideo);
-                    await botClient.SendVideoAsync(update.CallbackQuery.From.Id, new InputFileStream(stream));
-                    return;
-                }
-                int mediaMessageId = await cliBot.SendAndGetMediaMessageIdAsync(stream, true);
-                await botClient.SendChatActionAsync(update.CallbackQuery.From.Id, ChatAction.UploadVideo);
-                await botClient.SendVideoAsync(update.CallbackQuery.From.Id, new InputFileId($"https://t.me/YoutifyArchive/{mediaMessageId}"));
-            }
-            else
-            {
-                var stream = await youtubeSpotifyOperation.DownloadMediaAsync(url, size, false);
+                    User user = await unitOfWork.Repository<User>().FindByChatId(update.CallbackQuery.From.Id);
 
-                if (size < 50)
-                {
-                    await botClient.SendChatActionAsync(update.CallbackQuery.From.Id, ChatAction.RecordVideo);
-                    await botClient.SendAudioAsync(update.CallbackQuery.From.Id, new InputFileStream(stream));
+                    if (user.TotalDownloadVolume < size)
+                    {
+                        stringBuilder.AppendLine($"‼️<b>You can't download video/music file with volume bigger than {user.TotalDownloadVolume}MB</b>");
+                        await botClient.EditMessageTextAsync(update.CallbackQuery.From.Id, update.CallbackQuery.Message.MessageId, stringBuilder.ToString(), ParseMode.Html);
+                        return;
+                    }
+                    else if (user.TotalDownloadVolume / 2 < size && user.TotalCountDownload == 0)
+                    {
+                        stringBuilder.AppendLine($"‼️<b>You can download video/music file with volume bigger than a half of your total download volume({user.TotalDownloadVolume / 2}MB), twice a day</b>");
+                        await botClient.EditMessageTextAsync(update.CallbackQuery.From.Id, update.CallbackQuery.Message.MessageId, stringBuilder.ToString(),
+                                ParseMode.Html);
+                        return;
+                    }
+                    else if (user.TotalDownloadVolume / 2 < size && user.TotalCountDownload > 0)
+                        user.TotalCountDownload--;
+
+                    await botClient.EditMessageTextAsync(update.CallbackQuery.From.Id, update.CallbackQuery.Message.MessageId, "<pre>⚙️Processing is started...</pre>",
+                                   ParseMode.Html);
+                    if (data.StartsWith("YoutubeMovie"))
+                    {
+                        var stream = await youtubeSpotifyOperation.DownloadMediaAsync(url, size, true);
+
+                        if (size > 50)
+                        {
+                            int mediaMessageId = await cliBot.SendAndGetMediaMessageIdAsync(stream, true);
+                            await botClient.SendChatActionAsync(update.CallbackQuery.From.Id, ChatAction.UploadVideo);
+                            await botClient.SendVideoAsync(update.CallbackQuery.From.Id, new InputFileId($"https://t.me/YoutifyArchive/{mediaMessageId}"));
+                        }
+                        else
+                        {
+                            await botClient.SendChatActionAsync(update.CallbackQuery.From.Id, ChatAction.UploadVideo);
+                            await botClient.SendVideoAsync(update.CallbackQuery.From.Id, new InputFileStream(stream));
+                        }
+                    }
+                    else
+                    {
+                        var stream = await youtubeSpotifyOperation.DownloadMediaAsync(url, size, false);
+
+                        if (size > 50)
+                        {
+                            int mediaMessageId = await cliBot.SendAndGetMediaMessageIdAsync(stream, false);
+                            await botClient.SendChatActionAsync(update.CallbackQuery.From.Id, ChatAction.UploadVoice);
+                            await botClient.SendAudioAsync(update.CallbackQuery.From.Id, new InputFileId($"https://t.me/YoutifyArchive/{mediaMessageId}"));
+                        }
+                        else
+                        {
+                            await botClient.SendChatActionAsync(update.CallbackQuery.From.Id, ChatAction.RecordVideo);
+                            await botClient.SendAudioAsync(update.CallbackQuery.From.Id, new InputFileStream(stream));
+                        }
+                    }
+                    await unitOfWork.SaveAsync();
                 }
-                int mediaMessageId = await cliBot.SendAndGetMediaMessageIdAsync(stream, false);
-                await botClient.SendChatActionAsync(update.CallbackQuery.From.Id, ChatAction.UploadVoice);
-                await botClient.SendAudioAsync(update.CallbackQuery.From.Id, new InputFileId($"https://t.me/YoutifyArchive/{mediaMessageId}"));
             }
         }
         catch (Exception ex)
