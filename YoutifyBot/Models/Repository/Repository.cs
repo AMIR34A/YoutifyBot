@@ -20,6 +20,7 @@ namespace YoutifyBot.Models.Repository
 
         public async Task<IEnumerable<TEntity>> GetAllAsync() => await context.Set<TEntity>().ToListAsync();
         public async Task<TEntity> GetFirstAsync() => await context.Set<TEntity>().FirstAsync();
+        public async Task<bool> AynAsync(long chatId) => await context.Set<User>().AnyAsync(user => user.ChatId == chatId);
 
         public void Update(TEntity entity) => context.Update<TEntity>(entity);
 

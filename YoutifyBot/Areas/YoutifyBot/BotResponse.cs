@@ -39,8 +39,8 @@ public class BotResponse
                     if (text.Contains("invite"))
                     {
                         long invitedByChatId = long.Parse(text.Split('_')[1]);
-                        User isExist = await unitOfWork.Repository<User>().FindByChatId(update.Message.Chat.Id);
-                        if (isExist is null)
+                        bool isExist = await unitOfWork.Repository<User>().AynAsync(update.Message.Chat.Id);
+                        if (!isExist)
                         {
                             var invitedByuser = await unitOfWork.Repository<User>().FindByChatId(invitedByChatId);
                             if (invitedByuser.TotalDownloadVolume < rule.MaximumDownloadVolume)
@@ -53,6 +53,8 @@ public class BotResponse
                                 replyMarkup: new InlineKeyboardMarkup(InlineKeyboardButton.WithCallbackData("🖥Profile", "Profile")));
                             stringBuilder.Clear();
                         }
+                        else
+                            await botClient.SendTextMessageAsync(invitedByChatId, "<b>⚠️The user already exist</b>", parseMode: ParseMode.Html);
                     }
 
                     if (user is null)

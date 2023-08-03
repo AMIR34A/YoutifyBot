@@ -6,6 +6,7 @@ public interface IRepository<TEntity> : IDisposable
     Task CreateAsync(TEntity entity);
     Task<TEntity> GetFirstAsync();
     Task<TEntity> FindByChatId(long chatId);
+    Task<bool> AynAsync(long chatId);
     void Delete(TEntity entity);
     void Update(TEntity entity);
     Task<int> Count();
