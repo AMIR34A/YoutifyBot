@@ -1,4 +1,3 @@
-using System.Reflection;
 using WTelegram;
 using YoutifyBot.Areas;
 using YoutifyBot.Models;
@@ -10,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<YoutifyBotContext>();
-string path = System.IO.Directory.GetCurrentDirectory() + "\\WTelegram.session";
+string path = Directory.GetCurrentDirectory() + "\\WTelegram.session";
 builder.Services.AddSingleton(new Client(27024143, "195e31714975be496c8ad094c12ff9b6", path));
 builder.Services.AddSingleton<CliBot>();
 //builder.Services.AddDbContext<YoutifyBotContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("YoutifyConnection")));

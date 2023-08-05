@@ -12,6 +12,7 @@ public class CliBot
         new ConfigurationManager().AddJsonFile("logininformations.json").Build().Reload();
         configurationSections = new ConfigurationBuilder().AddJsonFile("logininformations.json").Build().GetSection("profile");
         this.clientBot = clientBot;
+        Helpers.Log = (lvl, str) => { };
         DoLogin(configurationSections["phone_number"]);
     }
 

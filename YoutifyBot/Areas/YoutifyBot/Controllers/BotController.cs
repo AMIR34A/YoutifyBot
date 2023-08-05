@@ -14,7 +14,7 @@ public class BotController : Controller
     static CliBot cliBot;
     public BotController(CliBot cli, IUnitOfWork unitOfWork)
     {
-        _botClient = new TelegramBotClient("6398637615:AAFqcxLt-HuY16lOPybbZYhlx1jVF6iK54Y");
+        _botClient = new TelegramBotClient("6056455211:AAHJyf6sMAO2KN06SzVtogRj5kdkKV-1S0E");
 
         var receiverOptions = new ReceiverOptions()
         {
