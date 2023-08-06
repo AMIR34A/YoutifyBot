@@ -77,7 +77,7 @@ public class BotResponse
                 stringBuilder.AppendLine("•You can download from youtube and spotify;");
                 stringBuilder.AppendLine("•Also you can use the <b>Menu</b> button for more informations");
                 stringBuilder.AppendLine("<b>I'm ready, just send me the link😃</b>");
-                await botClient.SendTextMessageAsync(chatId, stringBuilder.ToString(), null, ParseMode.Html);
+                await botClient.SendTextMessageAsync(chatId, stringBuilder.ToString(), parseMode: ParseMode.Html);
                 break;
 
 
@@ -89,7 +89,7 @@ public class BotResponse
                 stringBuilder.AppendLine("▪️https://youtu.be/...");
                 stringBuilder.AppendLine("<pre>🎵Spotify</pre>");
                 stringBuilder.AppendLine("▪️https://open.spotify.com/track/...");
-                await botClient.SendTextMessageAsync(chatId, stringBuilder.ToString(), null, ParseMode.Html, null, true);
+                await botClient.SendTextMessageAsync(chatId, stringBuilder.ToString(), parseMode: ParseMode.Html, disableWebPagePreview: true);
                 break;
 
 
@@ -164,7 +164,7 @@ public class BotResponse
                         user.TotalCountDownload--;
 
                     await botClient.EditMessageTextAsync(update.CallbackQuery.From.Id, update.CallbackQuery.Message.MessageId, "<pre>⚙️Processing is started...</pre>",
-                                   ParseMode.Html);
+                                ParseMode.Html);
                     if (data.StartsWith("YoutubeMovie"))
                     {
                         var stream = await youtubeSpotifyOperation.DownloadMediaAsync(url, size, true);
