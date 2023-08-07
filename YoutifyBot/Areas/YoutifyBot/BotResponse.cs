@@ -43,8 +43,8 @@ public class BotResponse
                         if (!isExist)
                         {
                             var invitedByuser = await unitOfWork.Repository<User>().FindByChatId(invitedByChatId);
-                            if (invitedByuser.TotalDownloadVolume < rule.MaximumDownloadVolume)
-                                invitedByuser.TotalDownloadVolume += 100;
+                            if (invitedByuser.MaximumSize < rule.MaximumDownloadSize)
+                                invitedByuser.MaximumSize += 100;
                             await unitOfWork.SaveAsync();
                             stringBuilder.AppendLine("One user was invited by you🎉");
                             stringBuilder.AppendLine("The maximum size of video you can download was updated.");
@@ -65,8 +65,7 @@ public class BotResponse
                             FirstName = update.Message.Chat.FirstName,
                             LastName = update.Message.Chat.LastName,
                             Username = update.Message.Chat.Username,
-                            TotalDownloadVolume = rule.BaseDownloadVolume,
-                            TotalCountDownload = rule.BaseCountDownload,
+                            MaximumSize = rule.BaseDownloadSize,
                         };
                         await unitOfWork.Repository<User>().CreateAsync(newUser);
                     }
@@ -147,21 +146,12 @@ public class BotResponse
                 {
                     User user = await unitOfWork.Repository<User>().FindByChatId(update.CallbackQuery.From.Id);
 
-                    if (user.TotalDownloadVolume < size)
+                    if (user.MaximumSize < size)
                     {
-                        stringBuilder.AppendLine($"‼️<b>You can't download video/music file with volume bigger than {user.TotalDownloadVolume}MB</b>");
+                        stringBuilder.AppendLine($"‼️<b>You can't download video/music file with volume bigger than {user.MaximumSize}MB</b>");
                         await botClient.EditMessageTextAsync(update.CallbackQuery.From.Id, update.CallbackQuery.Message.MessageId, stringBuilder.ToString(), ParseMode.Html);
                         return;
                     }
-                    else if (user.TotalDownloadVolume / 2 < size && user.TotalCountDownload == 0)
-                    {
-                        stringBuilder.AppendLine($"‼️<b>You can download video/music file with volume bigger than a half of your total download volume({user.TotalDownloadVolume / 2}MB), twice a day</b>");
-                        await botClient.EditMessageTextAsync(update.CallbackQuery.From.Id, update.CallbackQuery.Message.MessageId, stringBuilder.ToString(),
-                                ParseMode.Html);
-                        return;
-                    }
-                    else if (user.TotalDownloadVolume / 2 < size && user.TotalCountDownload > 0)
-                        user.TotalCountDownload--;
 
                     await botClient.EditMessageTextAsync(update.CallbackQuery.From.Id, update.CallbackQuery.Message.MessageId, "<pre>⚙️Processing is started...</pre>",
                                 ParseMode.Html);
