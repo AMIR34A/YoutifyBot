@@ -3,7 +3,6 @@ using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
-using YoutifyBot.Models.Repository;
 
 namespace YoutifyBot.Areas.YoutifyBot.Controllers;
 
@@ -12,9 +11,11 @@ public class BotController : Controller
 {
     static TelegramBotClient _botClient;
     static CliBot cliBot;
-    public BotController(CliBot cli, IUnitOfWork unitOfWork)
+    public BotController(CliBot cli) => cliBot = cli;
+
+    static BotController()
     {
-        _botClient = new TelegramBotClient("6056455211:AAHJyf6sMAO2KN06SzVtogRj5kdkKV-1S0E");
+        _botClient = new TelegramBotClient("6398637615:AAFqcxLt-HuY16lOPybbZYhlx1jVF6iK54Y");
 
         var receiverOptions = new ReceiverOptions()
         {
@@ -23,7 +24,6 @@ public class BotController : Controller
         };
 
         _botClient.StartReceiving(HandleUpdateAsyns, HandleErrorAsync, receiverOptions);
-        cliBot = cli;
     }
     public IActionResult Index()
     {

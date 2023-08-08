@@ -66,6 +66,7 @@ public class BotResponse
                             LastName = update.Message.Chat.LastName,
                             Username = update.Message.Chat.Username,
                             MaximumSize = rule.BaseDownloadSize,
+                            UserRole = Role.Member
                         };
                         await unitOfWork.Repository<User>().CreateAsync(newUser);
                     }

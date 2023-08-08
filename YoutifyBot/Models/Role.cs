@@ -1,6 +1,6 @@
 ﻿namespace YoutifyBot.Models;
 
-public enum Access
+public enum Role
 {
     Admin,
     Vip,

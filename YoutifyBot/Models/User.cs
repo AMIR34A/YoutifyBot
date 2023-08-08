@@ -7,5 +7,5 @@ public class User
     public string? LastName { get; set; }
     public string? Username { get; set; }
     public int MaximumSize { get; set; }
-    public Access UserAccess { get; set; }
+    public Role UserRole { get; set; }
 }
