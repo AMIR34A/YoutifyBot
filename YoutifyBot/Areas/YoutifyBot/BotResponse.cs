@@ -43,14 +43,13 @@ public class BotResponse
                         if (!isExist)
                         {
                             var invitedByuser = await unitOfWork.Repository<User>().FindByChatId(invitedByChatId);
-                            if (invitedByuser.MaximumSize < rule.MaximumDownloadSize)
-                                invitedByuser.MaximumSize += 100;
+                            if (invitedByuser.MaximumDownloadSize < rule.MaximumDownloadSize)
+                                invitedByuser.MaximumDownloadSize += rule.AmountRewardInviting;
                             await unitOfWork.SaveAsync();
                             stringBuilder.AppendLine("One user was invited by you🎉");
                             stringBuilder.AppendLine("The maximum size of video you can download was updated.");
                             stringBuilder.AppendLine("<b>You can see more detail in your profile</b>");
-                            await botClient.SendTextMessageAsync(invitedByChatId, stringBuilder.ToString(), null, ParseMode.Html,
-                                replyMarkup: new InlineKeyboardMarkup(InlineKeyboardButton.WithCallbackData("🖥Profile", "Profile")));
+                            await botClient.SendTextMessageAsync(invitedByChatId, stringBuilder.ToString(), null, ParseMode.Html);
                             stringBuilder.Clear();
                         }
                         else
@@ -65,7 +64,8 @@ public class BotResponse
                             FirstName = update.Message.Chat.FirstName,
                             LastName = update.Message.Chat.LastName,
                             Username = update.Message.Chat.Username,
-                            MaximumSize = rule.BaseDownloadSize,
+                            MaximumDownloadSize = rule.BaseDownloadSize,
+                            TotalDonwload = 0,
                             UserRole = Role.Member
                         };
                         await unitOfWork.Repository<User>().CreateAsync(newUser);
@@ -79,19 +79,6 @@ public class BotResponse
                 stringBuilder.AppendLine("<b>I'm ready, just send me the link😃</b>");
                 await botClient.SendTextMessageAsync(chatId, stringBuilder.ToString(), parseMode: ParseMode.Html);
                 break;
-
-
-            case string when text.Equals("/help"):
-                stringBuilder.AppendLine("You just need to send video or music link to me.");
-                stringBuilder.AppendLine("<b>Your link for downloading video and music must have this formats :</b>");
-                stringBuilder.AppendLine("<pre>🎞Youtube :</pre>");
-                stringBuilder.AppendLine("▪️https://www.youtube.com/...");
-                stringBuilder.AppendLine("▪️https://youtu.be/...");
-                stringBuilder.AppendLine("<pre>🎵Spotify</pre>");
-                stringBuilder.AppendLine("▪️https://open.spotify.com/track/...");
-                await botClient.SendTextMessageAsync(chatId, stringBuilder.ToString(), parseMode: ParseMode.Html, disableWebPagePreview: true);
-                break;
-
 
             case string when text.StartsWith("https://www.youtube.com/"):
             case string when text.StartsWith("https://youtu.be/"):
@@ -116,6 +103,33 @@ public class BotResponse
                 string[] musicDetails = searchQuery.Split('|');
                 await botClient.SendAudioAsync(update.Message.Chat.Id, new InputFileStream(stream), title: musicDetails[0], performer: musicDetails[1]);
                 break;
+
+            case "/help":
+                stringBuilder.AppendLine("You just need to send video or music link to me.");
+                stringBuilder.AppendLine("<b>Your link for downloading video and music must have this formats :</b>");
+                stringBuilder.AppendLine("<pre>🎞Youtube :</pre>");
+                stringBuilder.AppendLine("▪️https://www.youtube.com/...");
+                stringBuilder.AppendLine("▪️https://youtu.be/...");
+                stringBuilder.AppendLine("<pre>🎵Spotify</pre>");
+                stringBuilder.AppendLine("▪️https://open.spotify.com/track/...");
+                await botClient.SendTextMessageAsync(chatId, stringBuilder.ToString(), parseMode: ParseMode.Html, disableWebPagePreview: true);
+                break;
+
+            case "/upgrade":
+                using (IUnitOfWork unitOfWork = new UnitOfWork(new YoutifyBotContext()))
+                {
+                    Rule rule = await unitOfWork.Repository<Rule>().GetFirstAsync();
+                    User user = await unitOfWork.Repository<User>().FindByChatId(chatId);
+
+                    stringBuilder.AppendLine("<b>📈You can invite your friends to the bot, and update your maximum size download.</b>");
+                    stringBuilder.AppendLine($"<pre>•You gain {rule.AmountRewardInviting}MB for each user who you invited.</pre>");
+                    stringBuilder.AppendLine($"<pre>•Your maximum size download : {user.MaximumDownloadSize}MB.</pre>");
+                    stringBuilder.AppendLine($"<pre>•Now you can increase it to {rule.MaximumDownloadSize}MB.</pre>");
+                    stringBuilder.AppendLine("<b>🔐Use below button for your inviting link :</b>");
+                    await botClient.SendTextMessageAsync(chatId, stringBuilder.ToString(), parseMode: ParseMode.Html,
+                        replyMarkup: new InlineKeyboardMarkup(InlineKeyboardButton.WithCallbackData("🔗Inviting Link", "InvitingLink")));
+                }
+                break;
         }
     }
 
@@ -134,6 +148,7 @@ public class BotResponse
         YoutubeSpotifyOperation youtubeSpotifyOperation = new YoutubeSpotifyOperation();
 
         var data = update.CallbackQuery.Data;
+        StringBuilder stringBuilder = new StringBuilder();
 
         try
         {
@@ -142,14 +157,14 @@ public class BotResponse
                 string url = update.CallbackQuery.Message.Entities[0].Url;
                 double size = double.Parse(data.Split('|')[1]);
 
-                StringBuilder stringBuilder = new StringBuilder();
                 using (IUnitOfWork unitOfWork = new UnitOfWork(new YoutifyBotContext()))
                 {
                     User user = await unitOfWork.Repository<User>().FindByChatId(update.CallbackQuery.From.Id);
 
-                    if (user.MaximumSize < size)
+                    if (user.MaximumDownloadSize < size)
                     {
-                        stringBuilder.AppendLine($"‼️<b>You can't download video/music file with volume bigger than {user.MaximumSize}MB</b>");
+                        stringBuilder.AppendLine($"‼️<b>You can't download video/music file with volume bigger than {user.MaximumDownloadSize}MB</b>");
+                        stringBuilder.AppendLine("<b>💢Use /upgrae command for more infomations</b>");
                         await botClient.EditMessageTextAsync(update.CallbackQuery.From.Id, update.CallbackQuery.Message.MessageId, stringBuilder.ToString(), ParseMode.Html);
                         return;
                     }
@@ -190,6 +205,15 @@ public class BotResponse
                     }
                     await unitOfWork.SaveAsync();
                 }
+            }
+            else if (data.Equals("InvitingLink"))
+            {
+                await botClient.DeleteMessageAsync(update.CallbackQuery.From.Id, update.CallbackQuery.Message.MessageId);
+                stringBuilder.AppendLine("<pre>🖥You can download Youtube video and audio</pre>");
+                stringBuilder.AppendLine("<pre>🎵You can download Spotify music</pre>");
+                stringBuilder.AppendLine("<b>🚀Just start the bot : </b>");
+                stringBuilder.AppendLine($"https://t.me/YoutifyBot?start=invite_{update.CallbackQuery.From.Id}");
+                await botClient.SendPhotoAsync(update.CallbackQuery.From.Id, new InputFileId("https://t.me/YoutifyNews/16"), caption: stringBuilder.ToString(), parseMode: ParseMode.Html);
             }
         }
         catch (Exception ex)

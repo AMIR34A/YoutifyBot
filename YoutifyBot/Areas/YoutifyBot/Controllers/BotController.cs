@@ -35,7 +35,7 @@ public class BotController : Controller
         BotResponse botResponse = new BotResponse(cliBot);
         if (update.Type == UpdateType.Message && update.Message.Chat.Type == ChatType.Private)
             botResponse.ResponseToText(_botClient, update);
-        else
+        else if (update.Type == UpdateType.CallbackQuery)
             botResponse.ResponseToCallBackQuery(_botClient, update);
     }
 
