@@ -9,16 +9,15 @@ public class CliBot
     Client clientBot;
     public CliBot(Client clientBot)
     {
-        new ConfigurationManager().AddJsonFile("logininformations.json").Build().Reload();
         configurationSections = new ConfigurationBuilder().AddJsonFile("logininformations.json").Build().GetSection("profile");
         this.clientBot = clientBot;
-        Helpers.Log = (lvl, str) => { };
-        DoLogin(configurationSections["phone_number"]);
+        DoLoginAsync(configurationSections["phone_number"]);
+        //Helpers.Log = (lvl, str) => { };
     }
 
-    public async Task LoginAsync()
+    public async Task LoginAsync(string code)
     {
-        await clientBot.LoginUserIfNeeded();
+        await DoLoginAsync(code);
     }
 
     public async Task<int> SendAndGetMediaMessageIdAsync(Stream stream, bool isMovie)
@@ -41,14 +40,8 @@ public class CliBot
         return sentMessage.ID;
     }
 
-    async Task DoLogin(string loginInfo) // (add this method to your code)
+    public async Task DoLoginAsync(string loginInfo) // (add this method to your code)
     {
-        while (clientBot.User == null)
-            switch (await clientBot.Login(loginInfo)) // returns which config is needed to continue login
-            {
-                case "verification_code": Console.Write("Code: "); loginInfo = Console.ReadLine(); break;
-                case "password": loginInfo = configurationSections["password"]; break;
-                default: loginInfo = null; break;
-            }
+        await clientBot.Login(loginInfo);
     }
 }

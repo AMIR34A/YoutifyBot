@@ -10,7 +10,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<YoutifyBotContext>();
 string path = Directory.GetCurrentDirectory() + "\\WTelegram.session";
-builder.Services.AddSingleton(new Client(27024143, "195e31714975be496c8ad094c12ff9b6", path));
+var sections = builder.Configuration.AddJsonFile("logininformations.json").Build().GetSection("profile");
+builder.Services.AddSingleton(new Client(int.Parse(sections["api_id"]), sections["api_hash"], path));
 builder.Services.AddSingleton<CliBot>();
 //builder.Services.AddDbContext<YoutifyBotContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("YoutifyConnection")));
 
@@ -33,6 +34,11 @@ app.MapAreaControllerRoute(
     name: "management_route",
     areaName: "Management",
     pattern: "Management/{controller}/{action}");
+
+app.MapAreaControllerRoute(
+    name: "clientbotaccount_route",
+    areaName: "ClientBotAccount",
+    pattern: "ClientBotAccount/{controller}/{action}");
 
 app.MapControllerRoute(
     name: "default",

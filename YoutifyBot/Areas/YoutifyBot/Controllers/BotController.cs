@@ -15,7 +15,7 @@ public class BotController : Controller
 
     static BotController()
     {
-        _botClient = new TelegramBotClient("6398637615:AAFqcxLt-HuY16lOPybbZYhlx1jVF6iK54Y");
+        _botClient = new TelegramBotClient("6398637615:AAGXLoAqIrt2Rp64j_thLqJ1yMWxfIrowos");
 
         var receiverOptions = new ReceiverOptions()
         {
@@ -30,13 +30,22 @@ public class BotController : Controller
         return View();
     }
 
+    public async Task<IActionResult> Login()
+    {
+        //await cliBot.LoginAsync();
+        return View("Index");
+    }
     private static async Task HandleUpdateAsyns(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
         BotResponse botResponse = new BotResponse(cliBot);
-        if (update.Type == UpdateType.Message && update.Message.Chat.Type == ChatType.Private)
-            botResponse.ResponseToText(_botClient, update);
-        else if (update.Type == UpdateType.CallbackQuery)
-            botResponse.ResponseToCallBackQuery(_botClient, update);
+        try
+        {
+            if (update.Type == UpdateType.Message && update.Message.Chat.Type == ChatType.Private)
+                botResponse.ResponseToText(_botClient, update);
+            else if (update.Type == UpdateType.CallbackQuery)
+                botResponse.ResponseToCallBackQuery(_botClient, update);
+        }
+        catch { }
     }
 
     private static async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)

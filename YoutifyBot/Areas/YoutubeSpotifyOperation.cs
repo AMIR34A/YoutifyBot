@@ -21,7 +21,7 @@ public class YoutubeSpotifyOperation
         var manifests = await youtubeClient.Videos.Streams.GetManifestAsync(url);
 
         var audioes = manifests.GetAudioOnlyStreams().OrderBy(audio => audio.Size.MegaBytes);
-        var videos = manifests.GetMuxedStreams();
+        var videos = manifests.GetMuxedStreams().OrderBy(video => video.Size.MegaBytes);
 
 
         foreach (var video in videos)

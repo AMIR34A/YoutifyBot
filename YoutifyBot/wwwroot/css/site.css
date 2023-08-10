@@ -54,3 +54,33 @@ a {
 a:hover {
         color: #FFCC00
 }
+
+.row{
+    display: flex !important;
+    flex-wrap: wrap;
+    margin-top: 10px !important;
+    margin-right: 10px !important;
+    margin-left: 10px !important;
+}
+
+button.btn-info {
+    color: #000;
+    background-color: #afb9bc;
+    border-color: #8a8c8d;
+}
+
+.btn-info:hover {
+    color: #000;
+    background-color: #7eb9c5;
+    border-color: #ffffff;
+}
+
+.btn-info:focus {
+    color: #000;
+    background-color: #94b0b5;
+    border-color: #7599a0;
+}
+
+.btn:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #6582a0;
+}
