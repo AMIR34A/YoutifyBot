@@ -15,7 +15,7 @@ public class BotController : Controller
 
     static BotController()
     {
-        _botClient = new TelegramBotClient("6398637615:AAGXLoAqIrt2Rp64j_thLqJ1yMWxfIrowos");
+        _botClient = new TelegramBotClient("6398637615:AAH5-cUXSMSzYjWTS1gqYxKR52w-FjuhMZA");
 
         var receiverOptions = new ReceiverOptions()
         {

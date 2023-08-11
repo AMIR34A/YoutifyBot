@@ -9,9 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 builder.Services.AddTransient<YoutifyBotContext>();
-string path = Directory.GetCurrentDirectory() + "\\WTelegram.session";
-var sections = builder.Configuration.AddJsonFile("logininformations.json").Build().GetSection("profile");
-builder.Services.AddSingleton(new Client(int.Parse(sections["api_id"]), sections["api_hash"], path));
+//builder.Services.AddSingleton<Client>();
 builder.Services.AddSingleton<CliBot>();
 //builder.Services.AddDbContext<YoutifyBotContext>(option => option.UseSqlServer(builder.Configuration.GetConnectionString("YoutifyConnection")));
 

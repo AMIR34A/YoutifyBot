@@ -6,7 +6,6 @@ namespace YoutifyBot.Areas.ClientBotAccount.Controllers;
 public class HomeController : Controller
 {
     CliBot cliBot;
-    IConfigurationSection configurationSections;
     public HomeController(CliBot cliBot)
     {
         this.cliBot = cliBot;

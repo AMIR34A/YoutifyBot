@@ -6,13 +6,14 @@ namespace YoutifyBot.Areas;
 public class CliBot
 {
     static IConfigurationSection configurationSections;
-    Client clientBot;
-    public CliBot(Client clientBot)
+    static Client clientBot;
+    public CliBot()
     {
         configurationSections = new ConfigurationBuilder().AddJsonFile("logininformations.json").Build().GetSection("profile");
-        this.clientBot = clientBot;
+        
+        clientBot = new Client(int.Parse(configurationSections["api_id"]), configurationSections["api_hash"], AppContext.BaseDirectory + "Sessions\\WTelegram.session");
         DoLoginAsync(configurationSections["phone_number"]);
-        //Helpers.Log = (lvl, str) => { };
+        Helpers.Log = (lvl, str) => { };
     }
 
     public async Task LoginAsync(string code)
@@ -43,5 +44,10 @@ public class CliBot
     public async Task DoLoginAsync(string loginInfo) // (add this method to your code)
     {
         await clientBot.Login(loginInfo);
+    }
+
+    ~CliBot()
+    {
+        clientBot.Dispose();
     }
 }
