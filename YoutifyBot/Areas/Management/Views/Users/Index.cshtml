@@ -1,0 +1,71 @@
+﻿@using ReflectionIT.Mvc.Paging;
+@model PagingList<YoutifyBot.Areas.Management.Models.ViewModels.UsersViewModel>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                Users
+            </div>
+            <div class="card-body">
+                <p>
+                  @*<a asp-action="AddRole" class="btn btn-primary"></a>*@                
+                </p>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th class="text-center">
+                                @Html.DisplayNameFor(model=>model.FirstName)
+                            </th>
+                            <th class="text-center">
+                                @Html.DisplayNameFor(model=>model.LastName)
+                            </th>
+                            <th class="text-center">
+                                @Html.DisplayNameFor(model=>model.Username)
+                            </th>
+                            <th class="text-center">
+                                @Html.DisplayNameFor(model=>model.MaximumDownloadSize)
+                            </th>
+                            <th class="text-center">
+                                @Html.DisplayNameFor(model=>model.TotalDonwload)
+                            </th>
+                            <th class="text-center">
+                                @Html.DisplayNameFor(model=>model.UserRole)
+                            </th>
+                            <th class="text-center">Operations</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            <tr>
+                                @*<td>@Html.DisplayFor(model=>role.RoleName)</td>*@
+                                <td class="text-center">@user.FirstName</td>
+                                <td class="text-center">@user.LastName</td>
+                                <td class="text-center">
+                                    <a href="https://t.me/@user.Username" target="_blank" class="btn btn-info btn-icon" style="color: dodgerblue; background-color: inherit ;border-color:inherit;border:none">
+                                        <i class="fa-brands fa-telegram" ></i>
+                                    </a>
+                                </td>
+                                <td class="text-center">@user.MaximumDownloadSize MB</td>
+                                <td class="text-center">@user.TotalDonwload MB</td>
+                                <td class="text-center">@user.UserRole</td>
+                                <td class="text-center">
+                                    <a asp-action="EditRole" asp-route-id="@user.ChatId" class="btn btn-info btn-icon">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a asp-action="DeleteRole" asp-route-id="@user.ChatId" class="btn btn-danger btn-icon">
+                                        <i class="fa fa-trash"> </i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <nav style="display:-webkit-box">
+                    @await this.Component.InvokeAsync("Pager", new { PagingList = this.Model })
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>

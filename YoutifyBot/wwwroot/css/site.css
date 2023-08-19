@@ -1,61 +1,66 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
 }
 
 .container {
     display: -webkit-inline-box !important;
 }
+
 .navbar-nav {
     display: flex;
     flex-direction: inherit;
 }
+
 .navbar-nav .nav-link {
-    margin-left:10px !important;
+        margin-left: 10px !important;
 }
+
 .collapse:not(.show) {
-   display: -webkit-inline-box !important;
+    display: -webkit-inline-box !important;
 }
+
 .container-fluid {
     display: flow !important;
 }
+
 .navbar > .container, .navbar > .container-fluid, .navbar > .container-sm, .navbar > .container-md, .navbar > .container-lg, .navbar > .container-xl, .navbar > .container-xxl {
     display: -webkit-inline-box;
 }
+
 .navbar {
     display: block;
 }
-.nav-link {
-    display: block;
-    padding: 0.5rem 1rem;
-    color: #ffffff;
-}
+
+
+
 a {
-    color: #ffffff;
+    color: #000000;
 }
+
 a:hover {
         color: #FFCC00
 }
 
-.row{
+.row {
     display: flex !important;
     flex-wrap: wrap;
     margin-top: 10px !important;
@@ -80,3 +85,17 @@ button.btn-info {
     background-color: #94b0b5;
     border-color: #7599a0;
 }
+
+.btn-info {
+    color: black;
+    background-color: #0a58caab;
+    border-color: #08429875;
+}
+
+.pagination {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex ;
+    padding-left: 0 ;
+}
+
