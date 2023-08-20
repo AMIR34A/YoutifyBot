@@ -16,7 +16,7 @@ namespace YoutifyBot.Models.Repository
 
         public void Delete(TEntity entity) => context.Remove(entity);
 
-        public async Task<TEntity> FindByChatId(long chatId) => await context.FindAsync<TEntity>(chatId);
+        public async Task<TEntity> FindByChatIdAsync(long chatId) => await context.FindAsync<TEntity>(chatId);
 
         public async Task<IEnumerable<TEntity>> GetAllAsync() => await context.Set<TEntity>().ToListAsync();
         public async Task<TEntity> GetFirstAsync() => await context.Set<TEntity>().FirstAsync();
