@@ -51,7 +51,7 @@
                                 <td class="text-center">@user.TotalDonwload MB</td>
                                 <td class="text-center">@user.UserRole</td>
                                 <td class="text-center">
-                                    <a asp-action="EditRole" asp-route-id="@user.ChatId" class="btn btn-info btn-icon">
+                                    <a asp-action="Edit" asp-route-chatId="@user.ChatId" class="btn btn-info btn-icon">
                                         <i class="fa fa-edit"></i>
                                     </a>
                                     <a asp-action="DeleteRole" asp-route-id="@user.ChatId" class="btn btn-danger btn-icon">

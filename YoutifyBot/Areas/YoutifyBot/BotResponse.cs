@@ -34,7 +34,7 @@ public class BotResponse
                 using (IUnitOfWork unitOfWork = new UnitOfWork(new YoutifyBotContext()))
                 {
                     Rule rule = await unitOfWork.Repository<Rule>().GetFirstAsync();
-                    User user = await unitOfWork.Repository<User>().FindByChatId(chatId);
+                    User user = await unitOfWork.Repository<User>().FindByChatIdAsync(chatId);
 
                     if (text.Contains("invite"))
                     {
@@ -42,7 +42,7 @@ public class BotResponse
                         bool isExist = await unitOfWork.Repository<User>().AynAsync(update.Message.Chat.Id);
                         if (!isExist)
                         {
-                            var invitedByuser = await unitOfWork.Repository<User>().FindByChatId(invitedByChatId);
+                            var invitedByuser = await unitOfWork.Repository<User>().FindByChatIdAsync(invitedByChatId);
                             if (invitedByuser.MaximumDownloadSize < rule.MaximumDownloadSize)
                                 invitedByuser.MaximumDownloadSize += rule.AmountRewardInviting;
                             await unitOfWork.SaveAsync();
@@ -119,7 +119,7 @@ public class BotResponse
                 using (IUnitOfWork unitOfWork = new UnitOfWork(new YoutifyBotContext()))
                 {
                     Rule rule = await unitOfWork.Repository<Rule>().GetFirstAsync();
-                    User user = await unitOfWork.Repository<User>().FindByChatId(chatId);
+                    User user = await unitOfWork.Repository<User>().FindByChatIdAsync(chatId);
 
                     stringBuilder.AppendLine("<b>📈You can invite your friends to the bot, and update your maximum size download.</b>");
                     stringBuilder.AppendLine($"<pre>•You gain {rule.AmountRewardInviting}MB for each user who you invited.</pre>");
@@ -157,7 +157,7 @@ public class BotResponse
 
             using (IUnitOfWork unitOfWork = new UnitOfWork(new YoutifyBotContext()))
             {
-                User user = await unitOfWork.Repository<User>().FindByChatId(update.CallbackQuery.From.Id);
+                User user = await unitOfWork.Repository<User>().FindByChatIdAsync(update.CallbackQuery.From.Id);
 
                 if (user.MaximumDownloadSize < size)
                 {

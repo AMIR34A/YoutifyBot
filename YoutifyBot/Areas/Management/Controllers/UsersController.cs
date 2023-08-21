@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ReflectionIT.Mvc.Paging;
+using System.Security.Cryptography;
+using System.Text;
 using YoutifyBot.Areas.Management.Models.ViewModels;
 using YoutifyBot.Models;
 using YoutifyBot.Models.Repository;
@@ -35,6 +37,7 @@ public class UsersController : Controller
         return View(paging);
     }
 
+    [HttpGet]
     public async Task<IActionResult> Edit(long chatId)
     {
         var user = await unitOfWork.Repository<User>().FindByChatIdAsync(chatId);
@@ -49,5 +52,24 @@ public class UsersController : Controller
             UserRole = user.UserRole
         };
         return View(userViewModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(UsersViewModel userViewModel)
+    {
+        var user = new User()
+        {
+            ChatId = userViewModel.ChatId,
+            FirstName = userViewModel.FirstName,
+            LastName = userViewModel.LastName,
+            Username = userViewModel.Username,
+            MaximumDownloadSize = userViewModel.MaximumDownloadSize,
+            TotalDonwload = userViewModel.TotalDonwload,
+            UserRole = userViewModel.UserRole
+        };
+        unitOfWork.Repository<User>().Update(user);
+        await unitOfWork.SaveAsync();
+        return RedirectToAction("Index");
     }
 }

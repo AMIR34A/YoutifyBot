@@ -1,0 +1,76 @@
+﻿@model YoutifyBot.Areas.Management.Models.ViewModels.UsersViewModel
+
+<div class="container-fluid">
+    <form asp-action="Edit">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        افزودن اطلاعات کتاب
+                    </div>
+                    <div class="card-body">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <input type="hidden" asp-for="ChatId" />
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" asp-for="FirstName"></label>
+                                        <input asp-for="FirstName" class="form-control">
+                                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label asp-for="LastName" class="form-control-label"></label>
+                                        <input asp-for="LastName" class="form-control">
+                                        <span asp-validation-for="LastName" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label asp-for="Username" class="form-control-label"></label>
+                                        <input asp-for="Username" class="form-control">
+                                        <span asp-validation-for="Username" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="MaximumDownloadSize" class="form-control-label"></label>
+                                        <input asp-for="MaximumDownloadSize" class="form-control">
+                                        <span asp-validation-for="MaximumDownloadSize" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="TotalDonwload" class="form-control-label"></label>
+                                        <input asp-for="TotalDonwload" class="form-control">
+                                        <span asp-validation-for="TotalDonwload" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="UserRole" class="form-control-label"></label>
+                                        <select asp-for="UserRole" class="form-select form-control" aria-label="Default select example">     
+                                            <option selected>Select</option>
+                                            <option value="0">Admin</option>
+                                            <option value="1">Vip</option>
+                                            <option value="2">Member</option>
+                                        </select>
+                                        <span asp-validation-for="UserRole" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light text-right">
+                        <button type="submit" class="btn btn-success float-left">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
