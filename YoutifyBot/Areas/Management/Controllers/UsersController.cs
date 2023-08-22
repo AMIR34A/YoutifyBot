@@ -72,4 +72,20 @@ public class UsersController : Controller
         await unitOfWork.SaveAsync();
         return RedirectToAction("Index");
     }
+
+    public async Task<IActionResult> Delete(long chatId)
+    {
+        var user = await unitOfWork.Repository<User>().FindByChatIdAsync(chatId);
+        var userViewModel = new UsersViewModel()
+        {
+            ChatId = user.ChatId,
+            FirstName = string.IsNullOrEmpty(user.FirstName) ? "-" : user.FirstName,
+            LastName = string.IsNullOrEmpty(user.LastName) ? "-" : user.LastName,
+            Username = string.IsNullOrEmpty(user.Username) ? "-" : user.Username,
+            MaximumDownloadSize = user.MaximumDownloadSize,
+            TotalDonwload = user.TotalDonwload,
+            UserRole = user.UserRole
+        };
+        return View(userViewModel);
+    }
 }
