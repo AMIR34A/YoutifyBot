@@ -1,0 +1,19 @@
+﻿@model YoutifyBot.Areas.Management.Models.ViewModels.UsersViewModel
+
+<div class="row w-75 m-auto">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-light">Delete User</div>
+            <div class="card-body">
+                <p>Do you want to delete <span>@Model.FirstName with this @Model.ChatId chat id</span>?</p>
+            </div>
+            <div class="card-footer bg-light text-right clearfix">
+                <form asp-action="Delete">
+                    <input type="hidden" value="@Model.ChatId" name="ChatId"/>
+                    <input type="submit" value="Yes" class="btn btn-danger mr-2 float-left" />
+                    <a asp-action="Index" class="btn btn-info float-left">No</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

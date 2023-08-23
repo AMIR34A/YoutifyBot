@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ReflectionIT.Mvc.Paging;
-using System.Security.Cryptography;
-using System.Text;
 using YoutifyBot.Areas.Management.Models.ViewModels;
 using YoutifyBot.Models;
 using YoutifyBot.Models.Repository;
@@ -73,6 +71,7 @@ public class UsersController : Controller
         return RedirectToAction("Index");
     }
 
+    [HttpGet]
     public async Task<IActionResult> Delete(long chatId)
     {
         var user = await unitOfWork.Repository<User>().FindByChatIdAsync(chatId);
@@ -81,11 +80,17 @@ public class UsersController : Controller
             ChatId = user.ChatId,
             FirstName = string.IsNullOrEmpty(user.FirstName) ? "-" : user.FirstName,
             LastName = string.IsNullOrEmpty(user.LastName) ? "-" : user.LastName,
-            Username = string.IsNullOrEmpty(user.Username) ? "-" : user.Username,
-            MaximumDownloadSize = user.MaximumDownloadSize,
-            TotalDonwload = user.TotalDonwload,
-            UserRole = user.UserRole
         };
+
         return View(userViewModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(UsersViewModel userViewModel)
+    {
+        unitOfWork.Repository<User>().Delete(new User { ChatId = userViewModel.ChatId });
+        await unitOfWork.SaveAsync();
+        return RedirectToAction("Index");
     }
 }
