@@ -93,4 +93,9 @@ public class UsersController : Controller
         await unitOfWork.SaveAsync();
         return RedirectToAction("Index");
     }
+
+    public async Task<IActionResult> SendMessage(long chatId)
+    {
+        return View(chatId);
+    }
 }
