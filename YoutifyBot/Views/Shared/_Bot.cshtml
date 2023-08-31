@@ -10,6 +10,7 @@
     <link href="~/lib/bootstrap/dist/css/bootstrap.rtl.css" rel="stylesheet" />
     <link href="~/lib/bootstrap/dist/css/bootstrap.css" rel="stylesheet" />
     <link href="~/css/site.css" rel="stylesheet" />
+    <script src="~/lib/jquery/dist/jquery.js"></script>
 </head>
 <body>
     <nav class="navbar bg-dark border-bottom border-body" data-bs-theme="dark">
@@ -25,13 +26,15 @@
     <div>
         @RenderBody()
     </div>
+    <script src="https://kit.fontawesome.com/9d1ae22602.js" crossorigin="anonymous"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.esm.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.esm.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+
 </body>
-<script src="https://kit.fontawesome.com/9d1ae22602.js" crossorigin="anonymous"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.esm.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.esm.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+@await RenderSectionAsync("Scripts",false)
 </html>
 

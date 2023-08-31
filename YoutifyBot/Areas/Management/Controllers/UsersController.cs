@@ -94,8 +94,26 @@ public class UsersController : Controller
         return RedirectToAction("Index");
     }
 
-    public async Task<IActionResult> SendMessage(long chatId)
+    [HttpGet]
+    public async Task<IActionResult> SendMessage(UsersViewModel user)
     {
-        return View(chatId);
+        var viewModel = new SendMessageViewModel()
+        {
+            ChatId = user.ChatId,
+            FullName =$"{user.FirstName} {user.LastName}"
+        };
+
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> SendMessage(SendMessageViewModel sendMessageViewModel)
+    {
+        if(ModelState.IsValid)
+        {
+
+        }
+        return View();
     }
 }
