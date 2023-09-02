@@ -5,5 +5,6 @@ public enum Role
     Admin,
     Vip,
     Member,
-    All
+    All,
+    Blocked
 }

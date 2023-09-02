@@ -6,6 +6,7 @@ public class Rule
     public int BaseDownloadSize { get; set; }
     public int MaximumDownloadSize { get; set; }
     public int AmountRewardInviting { get; set; }
-    public bool ActiveNecessaryJoin { get; set; }
-    public Role Access { get; set; }
+    public bool IsNecessaryJoinActive { get; set; }
+    public string? NecessaryJoinChannels { get; set; }
+    public Role NecessaryJoinFor { get; set; }
 }

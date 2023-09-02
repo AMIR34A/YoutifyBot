@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ReflectionIT.Mvc.Paging;
+using Telegram.Bot;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using YoutifyBot.Areas.Management.Models.ViewModels;
 using YoutifyBot.Models;
 using YoutifyBot.Models.Repository;
+using User = YoutifyBot.Models.User;
 
 namespace YoutifyBot.Areas.Management.Controllers;
 
@@ -112,8 +116,16 @@ public class UsersController : Controller
     {
         if(ModelState.IsValid)
         {
+            TelegramBotClient telegramBotClient = new TelegramBotClient("6398637615:AAH5-cUXSMSzYjWTS1gqYxKR52w-FjuhMZA");
 
+            if (string.IsNullOrEmpty(sendMessageViewModel.Media))
+                await telegramBotClient.SendTextMessageAsync(sendMessageViewModel.ChatId, sendMessageViewModel.Text, parseMode: ParseMode.Html);
+            else
+            await telegramBotClient.SendPhotoAsync(sendMessageViewModel.ChatId, new InputFileId(sendMessageViewModel.Media), 
+                caption: sendMessageViewModel.Text, parseMode: ParseMode.Html);
+
+            return RedirectToAction("Index");
         }
-        return View();
+        return View(sendMessageViewModel);
     }
 }

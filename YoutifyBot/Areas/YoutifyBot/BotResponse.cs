@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using AngleSharp.Text;
+using System.Text;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
@@ -138,36 +139,53 @@ public class BotResponse
         if (!Enum.Equals(update.Type, UpdateType.CallbackQuery))
             return;
 
-        //var userStatus = await botClient.GetChatMemberAsync("@YoutifyNews", update.CallbackQuery.From.Id);
-        //if (userStatus.Status == ChatMemberStatus.Left)
-        //{
-        //    await botClient.AnswerCallbackQueryAsync(update.CallbackQuery.Id, "For dwonloading you have to join in the @YoutifyNews \n Link in the bio", true);
-        //    return;
-        //}
-
         YoutubeSpotifyOperation youtubeSpotifyOperation = new YoutubeSpotifyOperation();
+        StringBuilder stringBuilder = new StringBuilder();
 
         var data = update.CallbackQuery.Data;
-        StringBuilder stringBuilder = new StringBuilder();
+        long chatId = update.CallbackQuery.From.Id;
+
 
         if (data.StartsWith("Youtube"))
         {
             string url = update.CallbackQuery.Message.Entities[0].Url;
             double size = double.Parse(data.Split('|')[1]);
-
             using (IUnitOfWork unitOfWork = new UnitOfWork(new YoutifyBotContext()))
             {
-                User user = await unitOfWork.Repository<User>().FindByChatIdAsync(update.CallbackQuery.From.Id);
+                User user = await unitOfWork.Repository<User>().FindByChatIdAsync(chatId);
+                Rule rule = await unitOfWork.Repository<Rule>().GetFirstAsync();
+
+                if (rule.IsNecessaryJoinActive && user.UserRole == rule.NecessaryJoinFor)
+                {
+                    stringBuilder.AppendLine("<b>⚠️First of all, you should join in the below channels :</b>");
+                    bool isLeft = false;
+                    var channels = string.IsNullOrEmpty(rule.NecessaryJoinChannels) ? new string[] { "YoutifyNews" } : rule.NecessaryJoinChannels.SplitSpaces();
+                    foreach (var channel in channels)
+                    {
+                        var userStatus = await botClient.GetChatMemberAsync($"@{channel}", chatId);
+                        if (userStatus.Status == ChatMemberStatus.Left)
+                        {
+                            isLeft = true;
+                            stringBuilder.AppendLine($"•@{channel}");
+                        }
+                    }
+                    if (isLeft)
+                    {
+                        await botClient.SendTextMessageAsync(chatId, stringBuilder.ToString(), parseMode: ParseMode.Html);
+                        return;
+                    }
+                }
+
 
                 if (user.MaximumDownloadSize < size)
                 {
                     stringBuilder.AppendLine($"‼️<b>You can't download video/music file with volume bigger than {user.MaximumDownloadSize}MB</b>");
                     stringBuilder.AppendLine("<b>💢Use /upgrae command for more infomations</b>");
-                    await botClient.EditMessageTextAsync(update.CallbackQuery.From.Id, update.CallbackQuery.Message.MessageId, stringBuilder.ToString(), ParseMode.Html);
+                    await botClient.EditMessageTextAsync(chatId, update.CallbackQuery.Message.MessageId, stringBuilder.ToString(), ParseMode.Html);
                     return;
                 }
 
-                await botClient.EditMessageTextAsync(update.CallbackQuery.From.Id, update.CallbackQuery.Message.MessageId, "<pre>⚙️Processing is started...</pre>",
+                await botClient.EditMessageTextAsync(chatId, update.CallbackQuery.Message.MessageId, "<pre>⚙️Processing is started...</pre>",
                             ParseMode.Html);
                 if (data.StartsWith("YoutubeMovie"))
                 {
@@ -176,13 +194,13 @@ public class BotResponse
                     if (size > 50)
                     {
                         int mediaMessageId = await cliBot.SendAndGetMediaMessageIdAsync(stream, true);
-                        await botClient.SendChatActionAsync(update.CallbackQuery.From.Id, ChatAction.UploadVideo);
-                        await botClient.SendVideoAsync(update.CallbackQuery.From.Id, new InputFileId($"https://t.me/YoutifyArchive/{mediaMessageId}"));
+                        await botClient.SendChatActionAsync(chatId, ChatAction.UploadVideo);
+                        await botClient.SendVideoAsync(chatId, new InputFileId($"https://t.me/YoutifyArchive/{mediaMessageId}"));
                     }
                     else
                     {
-                        await botClient.SendChatActionAsync(update.CallbackQuery.From.Id, ChatAction.UploadVideo);
-                        await botClient.SendVideoAsync(update.CallbackQuery.From.Id, new InputFileStream(stream));
+                        await botClient.SendChatActionAsync(chatId, ChatAction.UploadVideo);
+                        await botClient.SendVideoAsync(chatId, new InputFileStream(stream));
                     }
                 }
                 else
@@ -192,13 +210,13 @@ public class BotResponse
                     if (size > 50)
                     {
                         int mediaMessageId = await cliBot.SendAndGetMediaMessageIdAsync(stream, false);
-                        await botClient.SendChatActionAsync(update.CallbackQuery.From.Id, ChatAction.UploadVoice);
-                        await botClient.SendAudioAsync(update.CallbackQuery.From.Id, new InputFileId($"https://t.me/YoutifyArchive/{mediaMessageId}"));
+                        await botClient.SendChatActionAsync(chatId, ChatAction.UploadVoice);
+                        await botClient.SendAudioAsync(chatId, new InputFileId($"https://t.me/YoutifyArchive/{mediaMessageId}"));
                     }
                     else
                     {
-                        await botClient.SendChatActionAsync(update.CallbackQuery.From.Id, ChatAction.RecordVideo);
-                        await botClient.SendAudioAsync(update.CallbackQuery.From.Id, new InputFileStream(stream));
+                        await botClient.SendChatActionAsync(chatId, ChatAction.RecordVideo);
+                        await botClient.SendAudioAsync(chatId, new InputFileStream(stream));
                     }
                 }
                 await unitOfWork.SaveAsync();
@@ -206,12 +224,12 @@ public class BotResponse
         }
         else if (data.Equals("InvitingLink"))
         {
-            await botClient.DeleteMessageAsync(update.CallbackQuery.From.Id, update.CallbackQuery.Message.MessageId);
+            await botClient.DeleteMessageAsync(chatId, update.CallbackQuery.Message.MessageId);
             stringBuilder.AppendLine("<pre>🖥You can download Youtube video and audio</pre>");
             stringBuilder.AppendLine("<pre>🎵You can download Spotify music</pre>");
             stringBuilder.AppendLine("<b>🚀Just start the bot : </b>");
-            stringBuilder.AppendLine($"https://t.me/YoutifyBot?start=invite_{update.CallbackQuery.From.Id}");
-            await botClient.SendPhotoAsync(update.CallbackQuery.From.Id, new InputFileId("https://t.me/YoutifyNews/16"), caption: stringBuilder.ToString(), parseMode: ParseMode.Html);
+            stringBuilder.AppendLine($"https://t.me/YoutifyBot?start=invite_{chatId}");
+            await botClient.SendPhotoAsync(chatId, new InputFileId("https://t.me/YoutifyNews/16"), caption: stringBuilder.ToString(), parseMode: ParseMode.Html);
         }
     }
 
