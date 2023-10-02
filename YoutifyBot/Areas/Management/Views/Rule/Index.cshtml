@@ -1,0 +1,73 @@
+﻿@model RuleViewModel
+@{
+    Layout = "_Bot";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Rule Manager - Index</title>
+</head>
+<body>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    Users
+                </div>
+                <div class="card-body">
+                    <p>
+                        @*<a asp-action="AddRole" class="btn btn-primary"></a>*@
+                    </p>
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th class="text-center">
+                                    @Html.DisplayNameFor(model=>model.BaseDownloadSize)
+                                </th>
+                                <th class="text-center">
+                                    @Html.DisplayNameFor(model=>model.MaximumDownloadSize)
+                                </th>
+                                <th class="text-center">
+                                    @Html.DisplayNameFor(model=>model.AmountRewardInviting)
+                                </th>
+                                <th class="text-center">
+                                    @Html.DisplayNameFor(model=>model.IsNecessaryJoinActive)
+                                </th>
+                                <th class="text-center">
+                                    @Html.DisplayNameFor(model=>model.NecessaryJoinChannels)
+                                </th>
+                                <th class="text-center">
+                                    @Html.DisplayNameFor(model=>model.NecessaryJoinFor)
+                                </th>
+                                <th class="text-center">Operations</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                @*<td>@Html.DisplayFor(model=>role.RoleName)</td>*@
+                                <td class="text-center">@Model.BaseDownloadSize</td>
+                                <td class="text-center">@Model.MaximumDownloadSize</td>
+                                <td class="text-center">@Model.AmountRewardInviting</td>
+                                <td class="text-center">@Model.IsNecessaryJoinActive</td>
+                                <td class="text-center">@Model.NecessaryJoinChannels</td>
+                                <td class="text-center">@Model.NecessaryJoinFor</td>
+                                <td class="text-center">
+                                    <a asp-action="Edit" asp-route-chatId="@Model.RuleId" class="btn btn-info btn-icon">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-chatId="@Model.RuleId" class="btn btn-danger btn-icon">
+                                        <i class="fa fa-trash"> </i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
