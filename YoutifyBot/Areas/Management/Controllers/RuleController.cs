@@ -27,4 +27,20 @@ public class RuleController : Controller
         };
         return View(ruleViewModel);
     }
+
+    public async Task<IActionResult> Edit(int ruleId)
+    {
+        var rule = await _unitOfWork.Repository<Rule>().FindByRuleIdAsync(ruleId);
+        var ruleViewModel = new RuleViewModel
+        {
+            RuleId = rule.RuleId,
+            BaseDownloadSize = rule.BaseDownloadSize,
+            MaximumDownloadSize = rule.MaximumDownloadSize,
+            AmountRewardInviting = rule.AmountRewardInviting,
+            IsNecessaryJoinActive = rule.IsNecessaryJoinActive,
+            NecessaryJoinChannels = rule.NecessaryJoinChannels,
+            NecessaryJoinFor = rule.NecessaryJoinFor
+        };
+        return View(rule);
+    }
 }
