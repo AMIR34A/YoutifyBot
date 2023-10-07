@@ -63,4 +63,12 @@ public class RuleController : Controller
         await _unitOfWork.SaveAsync();
         return RedirectToAction("Index");
     }
+
+    [HttpGet]
+    public async Task<IActionResult> Delete(int ruleId)
+    {
+        var rule = await _unitOfWork.Repository<Rule>().FindByRuleIdAsync(ruleId);
+        _unitOfWork.Repository<Rule>().Delete(rule);
+        return RedirectToAction("Index");
+    }
 }
