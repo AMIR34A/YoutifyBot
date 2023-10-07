@@ -28,6 +28,7 @@ public class RuleController : Controller
         return View(ruleViewModel);
     }
 
+    [HttpGet]
     public async Task<IActionResult> Edit(int ruleId)
     {
         var rule = await _unitOfWork.Repository<Rule>().FindByRuleIdAsync(ruleId);
@@ -41,6 +42,25 @@ public class RuleController : Controller
             NecessaryJoinChannels = rule.NecessaryJoinChannels,
             NecessaryJoinFor = rule.NecessaryJoinFor
         };
-        return View(rule);
+        return View(ruleViewModel);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Edit(RuleViewModel ruleViewModel)
+    {
+        var rule = new Rule
+        {
+            RuleId = ruleViewModel.RuleId,
+            BaseDownloadSize = ruleViewModel.BaseDownloadSize,
+            MaximumDownloadSize = ruleViewModel.MaximumDownloadSize,
+            AmountRewardInviting = ruleViewModel.AmountRewardInviting,
+            IsNecessaryJoinActive = ruleViewModel.IsNecessaryJoinActive,
+            NecessaryJoinChannels = ruleViewModel.NecessaryJoinChannels,
+            NecessaryJoinFor = ruleViewModel.NecessaryJoinFor
+        };
+
+        _unitOfWork.Repository<Rule>().Update(rule);
+        await _unitOfWork.SaveAsync();
+        return RedirectToAction("Index");
     }
 }

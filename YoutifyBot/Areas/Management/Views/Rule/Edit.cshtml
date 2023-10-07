@@ -1,0 +1,69 @@
+﻿@model RuleViewModel
+
+<div class="container-fluid">
+    <form asp-action="Edit">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-light">
+                        Edit User's Informations
+                    </div>
+                    <div class="card-body">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <input type="hidden" asp-for="RuleId" />
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label class="form-control-label" asp-for="BaseDownloadSize"></label>
+                                        <input asp-for="BaseDownloadSize" class="form-control">
+                                        <span asp-validation-for="BaseDownloadSize" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label asp-for="MaximumDownloadSize" class="form-control-label"></label>
+                                        <input asp-for="MaximumDownloadSize" class="form-control">
+                                        <span asp-validation-for="MaximumDownloadSize" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label asp-for="IsNecessaryJoinActive" class="form-control-label"></label>
+                                        @if (Model.IsNecessaryJoinActive)
+                                        {
+                                            <input type="checkbox" asp-for="IsNecessaryJoinActive" checked class="form-check-input">
+                                        }
+                                        else
+                                        {
+                                            <input type="checkbox" asp-for="IsNecessaryJoinActive" class="form-check-input">
+                                        }
+                                        <span asp-validation-for="IsNecessaryJoinActive" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="NecessaryJoinChannels" class="form-control-label"></label>
+                                        <input asp-for="NecessaryJoinChannels" class="form-control">
+                                        <span asp-validation-for="NecessaryJoinChannels" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="NecessaryJoinFor" class="form-control-label"></label>
+                                        <input asp-for="NecessaryJoinFor" class="form-control">
+                                        <span asp-validation-for="NecessaryJoinFor" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light text-right">
+                        <button type="submit" class="btn btn-success float-left">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
