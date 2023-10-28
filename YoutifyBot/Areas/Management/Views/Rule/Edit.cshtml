@@ -28,6 +28,13 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
+                                        <label asp-for="AmountRewardInviting" class="form-control-label"></label>
+                                        <input asp-for="AmountRewardInviting" class="form-control">
+                                        <span asp-validation-for="AmountRewardInviting" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
                                         <label asp-for="IsNecessaryJoinActive" class="form-control-label"></label>
                                         @if (Model.IsNecessaryJoinActive)
                                         {
