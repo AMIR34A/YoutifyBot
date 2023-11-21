@@ -2,8 +2,16 @@ using WTelegram;
 using YoutifyBot.Areas;
 using YoutifyBot.Models;
 using YoutifyBot.Models.Repository;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using YoutifyBot.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("YoutifyBotContextConnection") ?? throw new InvalidOperationException("Connection string 'YoutifyBotContextConnection' not found.");
+
+builder.Services.AddDbContext<YoutifyBotContext>(options => options.UseSqlServer(connectionString));
+
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<YoutifyBotContext>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
