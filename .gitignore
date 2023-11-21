@@ -364,3 +364,5 @@ FodyWeavers.xsd
 /YoutifyBot/Models/YoutifyBotContext.cs
 /YoutifyBot/Models/YoutifyBotContext.cs
 /YoutifyBot/logininformations.json
+/YoutifyBot/YoutifyBot.csproj
+/YoutifyBot/appsettings.json
