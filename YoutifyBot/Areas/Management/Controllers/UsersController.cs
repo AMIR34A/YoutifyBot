@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using ReflectionIT.Mvc.Paging;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -14,6 +15,8 @@ namespace YoutifyBot.Areas.Management.Controllers;
 public class UsersController : Controller
 {
     IUnitOfWork unitOfWork;
+    UserManager<IdentityUser<string>> _userManager;
+
     public UsersController(IUnitOfWork unitOfWork) => this.unitOfWork = unitOfWork;
 
     public async Task<IActionResult> Index(int pageSize = 10, int pageIndex = 1)
@@ -60,6 +63,11 @@ public class UsersController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(UsersViewModel userViewModel)
     {
+        if(userViewModel.UserRole == Role.Admin)
+        {
+            
+        }
+
         var user = new User()
         {
             ChatId = userViewModel.ChatId,
