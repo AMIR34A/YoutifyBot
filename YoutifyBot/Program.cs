@@ -9,9 +9,13 @@ using YoutifyBot.Data;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("YoutifyBotContextConnection") ?? throw new InvalidOperationException("Connection string 'YoutifyBotContextConnection' not found.");
 
-builder.Services.AddDbContext<YoutifyBotContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<IdentityContext>(options => options.UseSqlServer(connectionString));
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<YoutifyBotContext>();
+//builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<YoutifyBotContext>();
+
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+    .AddEntityFrameworkStores<IdentityContext>();
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
