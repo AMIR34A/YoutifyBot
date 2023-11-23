@@ -368,3 +368,4 @@ FodyWeavers.xsd
 /YoutifyBot/appsettings.json
 /YoutifyBot/Properties/serviceDependencies.json
 /YoutifyBot/Properties/serviceDependencies.local.json
+/YoutifyBot/Migrations/Identity
