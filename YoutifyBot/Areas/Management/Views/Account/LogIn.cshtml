@@ -1,0 +1,64 @@
+﻿@model YoutifyBot.Models.ViewModels.LogInViewModel
+@{
+    Layout = null;
+}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Youtify Management</title>
+    <link href="~/css/styles.css" rel="stylesheet" />
+    <link href="~/vendor/font-awesome/css/fontawesome-all.min.css" rel="stylesheet" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="page-wrapper flex-row align-items-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card mt-5">
+                        <div class="card-header text-center text-uppercase h4 font-weight-light">
+                            Login
+                        </div>
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="row py-2">
+                            <div class="col-md-12">
+                                <form asp-action="SignIn">
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label class="form-control-label" asp-for="Username"></label>
+                                            <input type="text" class="form-control" asp-for="Username" placeholder="username">
+                                            <span asp-validation-for="Username" class="text-danger"></span>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-control-label" asp-for="Password"></label>
+                                            <input type="password" class="form-control" asp-for="Password" placeholder="password">
+                                            <span asp-validation-for="Password" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <button type="submit" class="btn btn-primary px-5">Log in</button>
+                                            </div>
+                                            <div class="col-6">
+                                                <a asp-action="ForgetPassword" class="btn btn-link">Forget password</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>                   
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
