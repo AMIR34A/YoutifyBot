@@ -18,5 +18,20 @@ namespace YoutifyBot.Areas.Management.Controllers
 
         [HttpGet]
         public IActionResult LogIn() => View();
+
+        [HttpPost,ValidateAntiForgeryToken]
+        public async Task<IActionResult> LogIn(LogInViewModel logInViewModel)
+        {
+            if (!ModelState.IsValid)
+                return NotFound();
+            var user = await _userManager.FindByNameAsync(logInViewModel.Username);
+            if (user is null)
+                return NotFound();
+            var signInResult = await _signInManager.PasswordSignInAsync(user, logInViewModel.Password, false, false);
+            if (signInResult.Succeeded)
+                return RedirectToAction("Index", "Users");
+            ModelState.AddModelError(string.Empty, "The password is invalid!!!");
+            return View();
+        }
     }
 }
