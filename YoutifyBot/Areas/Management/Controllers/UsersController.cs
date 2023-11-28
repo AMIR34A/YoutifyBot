@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ReflectionIT.Mvc.Paging;
+using System.Security.Claims;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using YoutifyBot.Areas.Management.Models.ViewModels;
 using YoutifyBot.Models;
 using YoutifyBot.Models.Repository;
+using YoutifyBot.Models.ViewModels;
 using User = YoutifyBot.Models.User;
 
 namespace YoutifyBot.Areas.Management.Controllers;
@@ -63,9 +65,12 @@ public class UsersController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(UsersViewModel userViewModel)
     {
-        if(userViewModel.UserRole == Role.Admin)
+        if (userViewModel.UserRole == Role.Admin)
         {
-            
+            var identityUser = await _userManager.FindByNameAsync(userViewModel.Username);
+            if (identityUser is null)
+                return NotFound();
+            await _userManager.AddClaimAsync(identityUser, new Claim(ClaimTypes.Role, "Admin"));
         }
 
         var user = new User()
@@ -112,7 +117,7 @@ public class UsersController : Controller
         var viewModel = new SendMessageViewModel()
         {
             ChatId = user.ChatId,
-            FullName =$"{user.FirstName} {user.LastName}"
+            FullName = $"{user.FirstName} {user.LastName}"
         };
 
         return View(viewModel);
@@ -122,15 +127,15 @@ public class UsersController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> SendMessage(SendMessageViewModel sendMessageViewModel)
     {
-        if(ModelState.IsValid)
+        if (ModelState.IsValid)
         {
             TelegramBotClient telegramBotClient = new TelegramBotClient("6398637615:AAH5-cUXSMSzYjWTS1gqYxKR52w-FjuhMZA");
 
             if (string.IsNullOrEmpty(sendMessageViewModel.Media))
                 await telegramBotClient.SendTextMessageAsync(sendMessageViewModel.ChatId, sendMessageViewModel.Text, parseMode: ParseMode.Html);
             else
-            await telegramBotClient.SendPhotoAsync(sendMessageViewModel.ChatId, new InputFileId(sendMessageViewModel.Media), 
-                caption: sendMessageViewModel.Text, parseMode: ParseMode.Html);
+                await telegramBotClient.SendPhotoAsync(sendMessageViewModel.ChatId, new InputFileId(sendMessageViewModel.Media),
+                    caption: sendMessageViewModel.Text, parseMode: ParseMode.Html);
 
             return RedirectToAction("Index");
         }
