@@ -65,13 +65,14 @@ public class UsersController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(UsersViewModel userViewModel)
     {
+        var identityUser = await _userManager.FindByNameAsync(userViewModel.Username);
+        if (identityUser is null)
+            return NotFound();
         if (userViewModel.UserRole == Role.Admin)
-        {
-            var identityUser = await _userManager.FindByNameAsync(userViewModel.Username);
-            if (identityUser is null)
-                return NotFound();
             await _userManager.AddClaimAsync(identityUser, new Claim(ClaimTypes.Role, "Admin"));
-        }
+        else
+            await _userManager.RemoveClaimAsync(user, new Claim(ClaimTypes.Role, "Admin"));
+
 
         var user = new User()
         {
