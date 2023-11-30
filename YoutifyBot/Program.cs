@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using YoutifyBot.Areas;
 using YoutifyBot.Data;
 using YoutifyBot.Models;
@@ -15,6 +16,10 @@ builder.Services.AddDbContext<IdentityContext>(options => options.UseSqlServer(c
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<IdentityContext>();
 
+builder.Services.AddAuthorization(option =>
+{
+    option.AddPolicy("Admin", policy => policy.RequireRole("Admin"));
+});
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
