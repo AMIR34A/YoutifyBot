@@ -1,14 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ReflectionIT.Mvc.Paging;
-using System.Security.Claims;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using YoutifyBot.Areas.Management.Models.ViewModels;
 using YoutifyBot.Models;
 using YoutifyBot.Models.Repository;
-using YoutifyBot.Models.ViewModels;
 using User = YoutifyBot.Models.User;
 
 namespace YoutifyBot.Areas.Management.Controllers;
@@ -73,9 +71,9 @@ public class UsersController : Controller
         if (identityUser is null)
             return NotFound();
         if (userViewModel.UserRole == Role.Admin)
-            await _userManager.AddClaimAsync(identityUser, new Claim(ClaimTypes.Role, "Admin"));
+            await _userManager.AddToRoleAsync(identityUser, "Admin");
         else
-            await _userManager.RemoveClaimAsync(user, new Claim(ClaimTypes.Role, "Admin"));
+            await _userManager.RemoveFromRoleAsync(identityUser, "Admin");
 
 
         var user = new User()
