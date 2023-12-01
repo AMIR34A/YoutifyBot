@@ -16,10 +16,14 @@ namespace YoutifyBot.Areas.Management.Controllers;
 [Area("Management")]
 public class UsersController : Controller
 {
-    IUnitOfWork unitOfWork;
-    UserManager<IdentityUser<string>> _userManager;
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly UserManager<IdentityUser<string>> _userManager;
 
-    public UsersController(IUnitOfWork unitOfWork) => this.unitOfWork = unitOfWork;
+    public UsersController(IUnitOfWork unitOfWork, UserManager<IdentityUser<string>> userManager)
+    {
+        _unitOfWork = unitOfWork;
+        _userManager = userManager;
+    }
 
     public async Task<IActionResult> Index(int pageSize = 10, int pageIndex = 1)
     {
