@@ -27,7 +27,7 @@ public class UsersController : Controller
 
     public async Task<IActionResult> Index(int pageSize = 10, int pageIndex = 1)
     {
-        var users = await unitOfWork.Repository<User>().GetAllAsync();
+        var users = await _unitOfWork.Repository<User>().GetAllAsync();
 
         var paging = PagingList.Create(users.Select(
             user => new UsersViewModel
@@ -51,7 +51,7 @@ public class UsersController : Controller
     [HttpGet]
     public async Task<IActionResult> Edit(long chatId)
     {
-        var user = await unitOfWork.Repository<User>().FindByChatIdAsync(chatId);
+        var user = await _unitOfWork.Repository<User>().FindByChatIdAsync(chatId);
         var userViewModel = new UsersViewModel()
         {
             ChatId = user.ChatId,
@@ -88,15 +88,15 @@ public class UsersController : Controller
             TotalDonwload = userViewModel.TotalDonwload,
             UserRole = userViewModel.UserRole
         };
-        unitOfWork.Repository<User>().Update(user);
-        await unitOfWork.SaveAsync();
+        _unitOfWork.Repository<User>().Update(user);
+        await _unitOfWork.SaveAsync();
         return RedirectToAction("Index");
     }
 
     [HttpGet]
     public async Task<IActionResult> Delete(long chatId)
     {
-        var user = await unitOfWork.Repository<User>().FindByChatIdAsync(chatId);
+        var user = await _unitOfWork.Repository<User>().FindByChatIdAsync(chatId);
         var userViewModel = new UsersViewModel()
         {
             ChatId = user.ChatId,
@@ -111,8 +111,8 @@ public class UsersController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(UsersViewModel userViewModel)
     {
-        unitOfWork.Repository<User>().Delete(new User { ChatId = userViewModel.ChatId });
-        await unitOfWork.SaveAsync();
+        _unitOfWork.Repository<User>().Delete(new User { ChatId = userViewModel.ChatId });
+        await _unitOfWork.SaveAsync();
         return RedirectToAction("Index");
     }
 
