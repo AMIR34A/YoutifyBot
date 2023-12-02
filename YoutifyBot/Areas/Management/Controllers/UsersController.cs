@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ReflectionIT.Mvc.Paging;
 using Telegram.Bot;
@@ -12,6 +13,7 @@ using User = YoutifyBot.Models.User;
 namespace YoutifyBot.Areas.Management.Controllers;
 
 [Area("Management")]
+[Authorize(Roles = "Admin")]
 public class UsersController : Controller
 {
     private readonly IUnitOfWork _unitOfWork;
