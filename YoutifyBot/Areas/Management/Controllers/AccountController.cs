@@ -31,7 +31,7 @@ namespace YoutifyBot.Areas.Management.Controllers
             if (signInResult.Succeeded)
                 return RedirectToAction("Index", "Users");
             if (signInResult.IsLockedOut)
-                ModelState.AddModelError(string.Empty, "The password is invalid!!!");
+                ModelState.AddModelError(string.Empty, "Your account was locked");
             else
                 ModelState.AddModelError(string.Empty, "The password is invalid!!!");
             return View(new LogInViewModel { Username = logInViewModel.Username });
